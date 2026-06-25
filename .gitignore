@@ -7,6 +7,9 @@ tim-paginas/
 # Dependencias de Node (plugins)
 node_modules/
 
+# Documento de devolución interna (no publicar)
+DEVOLUCION_landing.md
+
 # Archivos del sistema operativo
 .DS_Store
 Thumbs.db
