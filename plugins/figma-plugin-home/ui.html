@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: Inter, sans-serif; }
+  body { background: #fff; color: #333; }
+  .header { background: #722F37; color: white; padding: 20px 24px 16px; }
+  .header h1 { font-size: 17px; font-weight: 700; letter-spacing: -.3px; }
+  .header p  { font-size: 11px; opacity: .65; margin-top: 3px; }
+  .content { padding: 18px 24px 20px; }
+  .steps { margin-bottom: 18px; }
+  .step { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; font-size: 12.5px; line-height: 1.4; }
+  .num { background: #F5EAEB; color: #722F37; min-width: 20px; height: 20px; border-radius: 50%;
+         display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 10px; }
+  .sections { font-size: 11.5px; color: #555; margin-bottom: 18px; line-height: 1.8;
+              background: #F7F7F7; border-radius: 8px; padding: 10px 14px; }
+  .sections strong { color: #722F37; }
+  #log { background: #F7F7F7; border-radius: 8px; padding: 10px 12px; min-height: 80px;
+         max-height: 200px; overflow-y: auto; font-size: 11px; color: #444; line-height: 1.9;
+         display: none; margin-bottom: 14px; font-family: monospace; white-space: pre-wrap; }
+  #run-btn { background: #722F37; color: white; border: none; border-radius: 8px;
+             width: 100%; padding: 13px; font-size: 13.5px; font-weight: 700; cursor: pointer; }
+  #run-btn:hover:not(:disabled) { background: #5A2229; }
+  #run-btn:disabled { background: #bbb; cursor: not-allowed; }
+  .done { text-align: center; color: #722F37; font-weight: 700; font-size: 13px;
+          padding: 14px; display: none; background: #F5EAEB; border-radius: 8px; margin-bottom: 10px; }
+  .err  { color: #c0392b; font-size: 12px; padding: 10px; display: none; margin-bottom: 10px;
+          background: #fdecea; border-radius: 8px; }
+  #close-btn { background: none; border: 2px solid #722F37; color: #722F37; border-radius: 8px;
+               width: 100%; padding: 10px; font-size: 13px; font-weight: 600; cursor: pointer;
+               margin-top: 8px; display: none; }
+  #close-btn:hover { background: #F5EAEB; }
+</style>
+</head>
+<body>
+<div class="header">
+  <h1>TIM — HOME</h1>
+  <p>Terminal Inteligente de Mendoza &nbsp;·&nbsp; Nexo Studio 2026</p>
+</div>
+<div class="content">
+  <div class="steps">
+    <div class="step"><div class="num">1</div><span>Valida (o crea) la página <strong>🏠 HOME</strong></span></div>
+    <div class="step"><div class="num">2</div><span>Construye el <strong>wireframe completo</strong> de la HOME en la página 🏠</span></div>
+  </div>
+  <div class="sections">
+    <strong>Navbar</strong> · sticky, borgoña, 5 links + botón Accesibilidad<br>
+    <strong>Hero</strong> · H1 64px, barra de búsqueda 3 campos, stats<br>
+    <strong>Servicios</strong> · 5 cards en fila (Larga Distancia → Universitario)<br>
+    <strong>Cómo usar</strong> · 3 pasos con flechas, fondo gris<br>
+    <strong>Destacados</strong> · 3 news cards con imagen placeholder<br>
+    <strong>Footer</strong> · 4 columnas, fondo oscuro
+  </div>
+  <div id="log"></div>
+  <div class="done" id="done">✅ &nbsp;HOME generada — podés cerrar el plugin</div>
+  <div class="err"  id="err"></div>
+  <button id="run-btn" onclick="run()">Generar HOME</button>
+  <button id="close-btn" onclick="close_()">Cerrar plugin</button>
+</div>
+<script>
+  function run() {
+    document.getElementById('run-btn').disabled = true;
+    document.getElementById('run-btn').textContent = 'Generando…';
+    const log = document.getElementById('log');
+    log.style.display = 'block'; log.textContent = '';
+    parent.postMessage({ pluginMessage: { type: 'run' } }, '*');
+  }
+  function close_() { parent.postMessage({ pluginMessage: { type: 'close' } }, '*'); }
+  window.onmessage = (e) => {
+    const m = e.data.pluginMessage;
+    if (!m) return;
+    if (m.type === 'log') {
+      const log = document.getElementById('log');
+      log.textContent += m.text + '\n';
+      log.scrollTop = log.scrollHeight;
+    }
+    if (m.type === 'done') {
+      document.getElementById('run-btn').style.display = 'none';
+      document.getElementById('done').style.display = 'block';
+      document.getElementById('close-btn').style.display = 'block';
+    }
+    if (m.type === 'error') {
+      document.getElementById('run-btn').disabled = false;
+      document.getElementById('run-btn').textContent = 'Reintentar';
+      const err = document.getElementById('err');
+      err.textContent = '❌ Error: ' + m.text;
+      err.style.display = 'block';
+    }
+  };
+</script>
+</body>
+</html>

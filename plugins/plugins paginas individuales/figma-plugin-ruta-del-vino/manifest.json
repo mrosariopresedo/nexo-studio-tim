@@ -1,0 +1,8 @@
+{
+  "name": "TIM — Ruta del Vino",
+  "id": "tim-ruta-del-vino-2026",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "ui.html",
+  "editorType": ["figma"]
+}

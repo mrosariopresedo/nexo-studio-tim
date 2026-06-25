@@ -1,0 +1,12 @@
+# Subrepos individuales de cada integrante (repos git propios) — no versionar acá
+tim-paginas/
+
+# Archivos fuente de Figma (binarios pesados)
+*.fig
+
+# Dependencias de Node (plugins)
+node_modules/
+
+# Archivos del sistema operativo
+.DS_Store
+Thumbs.db

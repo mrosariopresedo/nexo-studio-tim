@@ -1,0 +1,999 @@
+// ─── TIM · CIUDAD UNIVERSITARIA — Figma Plugin ────────────────────────────────
+// Genera 4 frames (Servicio, Paradas, Recorrido, Horarios) al lado del frame
+// LARGA DISTANCIA — TIM y conecta el prototipo entre ellos y con el HOME — TIM.
+// ─────────────────────────────────────────────────────────────────────────────
+
+figma.showUI(__html__, { width: 440, height: 520, title: "TIM — Ciudad Universitaria" });
+
+// ─── CONSTANTS ───────────────────────────────────────────────────────────────
+const PAGE_NAME = "Pagina Web";
+const HOME_NAME = "HOME — TIM";
+const LD_NAME   = "LARGA DISTANCIA — TIM";
+
+const CU_SERVICIO  = "CIUDAD UNIVERSITARIA — TIM";
+const CU_PARADAS   = "CIUDAD UNIVERSITARIA — PARADAS";
+const CU_RECORRIDO = "CIUDAD UNIVERSITARIA — RECORRIDO";
+const CU_HORARIOS  = "CIUDAD UNIVERSITARIA — HORARIOS";
+
+const FW = 1440;
+const CX = 80;
+const CW = 1280;
+const GAP = 24;
+
+// Paleta borgoña (idéntica a la del sitio Ciudad Universitaria)
+const BORGONA       = "722F37";
+const BORGONA_LIGHT = "F5EAEB";
+const BORGONA_DARK  = "5C242C";
+const BORGONA_DEEP  = "3A1116";
+const CORDILLERA    = "333333";
+
+// Neutros
+const BLANCO        = "FFFFFF";
+const BG_GRAY       = "F9FAFB";
+const NEUTRAL_50    = "FAFAFA";
+const NEUTRAL_100   = "F5F5F5";
+const NEUTRAL_200   = "E5E5E5";
+const NEUTRAL_300   = "D4D4D4";
+const NEUTRAL_400   = "A3A3A3";
+const NEUTRAL_500   = "737373";
+const NEUTRAL_600   = "525252";
+const NEUTRAL_700   = "404040";
+const NEUTRAL_800   = "262626";
+const NEUTRAL_900   = "171717";
+
+// Acentos
+const ROSE_50       = "FFF1F2";
+const ROSE_100      = "FFE4E6";
+const ROSE_200      = "FECDD3";
+const ROSE_300      = "FDA4AF";
+const ROSE_400      = "FB7185";
+const ROSE_500      = "F43F5E";
+const ROSE_800      = "9F1239";
+const ROSE_900      = "881337";
+
+const EMERALD_50    = "ECFDF5";
+const EMERALD_100   = "D1FAE5";
+const EMERALD_400   = "34D399";
+const EMERALD_500   = "10B981";
+const EMERALD_600   = "059669";
+const EMERALD_800   = "065F46";
+const EMERALD_950   = "022C22";
+
+const AMBER_50      = "FFFBEB";
+const AMBER_100     = "FEF3C7";
+const AMBER_200     = "FDE68A";
+const AMBER_600     = "D97706";
+const AMBER_800     = "92400E";
+const AMBER_950     = "451A03";
+
+const SKY_400       = "38BDF8";
+const SLATE_50      = "F8FAFC";
+const ZINC_700      = "3F3F46";
+const ZINC_800      = "27272A";
+
+const REGULAR = 400, MEDIUM = 500, SEMIBOLD = 600, BOLD = 700, EXTRABOLD = 800, BLACK = 900;
+
+// ─── HELPERS ─────────────────────────────────────────────────────────────────
+function post(msg) { figma.ui.postMessage(msg); }
+
+function hexRGB(c) {
+  const h = c.length === 8 ? c.slice(0, 6) : c;
+  return {
+    r: parseInt(h.slice(0, 2), 16) / 255,
+    g: parseInt(h.slice(2, 4), 16) / 255,
+    b: parseInt(h.slice(4, 6), 16) / 255
+  };
+}
+
+function weightStyle(w) {
+  if (w >= 900) return "Black";
+  if (w >= 800) return "Extra Bold";
+  if (w >= 700) return "Bold";
+  if (w >= 600) return "Semi Bold";
+  if (w >= 500) return "Medium";
+  return "Regular";
+}
+
+function rect(parent, x, y, w, h, fillHex, opts) {
+  const o = opts || {};
+  const r = figma.createRectangle();
+  r.x = x; r.y = y; r.resize(Math.max(w, 1), Math.max(h, 1));
+  r.fills = fillHex ? [{ type: "SOLID", color: hexRGB(fillHex) }] : [];
+  if (o.radius !== undefined) r.cornerRadius = o.radius;
+  if (o.stroke) {
+    r.strokes = [{ type: "SOLID", color: hexRGB(o.stroke) }];
+    r.strokeWeight = o.sw || 1;
+    r.strokeAlign = o.strokeAlign || "INSIDE";
+  }
+  if (o.opacity !== undefined) r.opacity = o.opacity;
+  if (o.name) r.name = o.name;
+  parent.appendChild(r);
+  return r;
+}
+
+async function txt(parent, x, y, chars, weight, size, colorHex, opts) {
+  const o = opts || {};
+  const style = weightStyle(weight);
+  await figma.loadFontAsync({ family: "Inter", style });
+  const t = figma.createText();
+  t.fontName = { family: "Inter", style };
+  t.characters = chars;
+  t.fontSize = size;
+  t.fills = [{ type: "SOLID", color: hexRGB(colorHex) }];
+  t.x = x; t.y = y;
+  if (o.opacity !== undefined) t.opacity = o.opacity;
+  if (o.w) { t.textAutoResize = "HEIGHT"; t.resize(o.w, t.height); }
+  if (o.align) t.textAlignHorizontal = o.align;
+  if (o.lh) t.lineHeight = { value: o.lh, unit: "PIXELS" };
+  if (o.spacing) t.letterSpacing = { value: o.spacing, unit: "PIXELS" };
+  if (o.name) t.name = o.name;
+  parent.appendChild(t);
+  return t;
+}
+
+function svgNode(parent, svgStr, x, y, w, h) {
+  try {
+    const node = figma.createNodeFromSvg(svgStr);
+    node.resize(w, h);
+    node.x = x; node.y = y;
+    parent.appendChild(node);
+    return node;
+  } catch (e) {
+    return rect(parent, x, y, w, h, BORGONA_LIGHT, { radius: 4 });
+  }
+}
+
+// Crea un hotspot transparente clickeable para prototipo
+function hotspot(parent, x, y, w, h, name) {
+  const r = figma.createRectangle();
+  r.name = name || "hotspot";
+  r.x = x; r.y = y; r.resize(w, h);
+  r.fills = [];
+  r.opacity = 0.01;
+  parent.appendChild(r);
+  return r;
+}
+
+// ─── SVG ASSETS (lucide-style) ────────────────────────────────────────────────
+function lucide(stroke, body, sw) {
+  var s = sw || 2;
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="#' + stroke + '" stroke-width="' + s + '" stroke-linecap="round" stroke-linejoin="round">' + body + '</svg>';
+}
+
+const PATH_BUS = `<path d="M19 17h2c.6 0 1-.4 1-1v-3c0-.9-.7-1.7-1.5-1.9C18.7 10.6 16 10 16 10s-1.3-1.4-2.2-2.3c-.5-.4-1.1-.7-1.8-.7H5c-.6 0-1.1.4-1.4.9l-1.4 2.9A3.7 3.7 0 0 0 2 12v4c0 .6.4 1 1 1h2"/><circle cx="7" cy="17" r="2"/><path d="M9 17h6"/><circle cx="17" cy="17" r="2"/><path d="M6 10h10"/><path d="M6 13h5"/>`;
+const PATH_INFO = `<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>`;
+const PATH_PHONE = `<path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>`;
+const PATH_COMPASS = `<circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/>`;
+const PATH_MAPPIN = `<path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"/><circle cx="12" cy="10" r="3"/>`;
+const PATH_CLOCK = `<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>`;
+const PATH_CHECK = `<path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/>`;
+const PATH_ACCESSIBILITY = `<circle cx="16" cy="4" r="1"/><path d="m18 19 1-7-6 1"/><path d="m5 8 3-3 5.5 3-2.36 3.5"/><path d="M4.24 14.5a5 5 0 0 0 6.88 6"/><path d="M13.76 17.5a5 5 0 0 0-6.88-6"/>`;
+const PATH_AWARD = `<circle cx="12" cy="8" r="6"/><path d="M15.477 12.89 17 22l-5-3-5 3 1.523-9.11"/>`;
+const PATH_CHEVRON_R = `<polyline points="9 18 15 12 9 6"/>`;
+const PATH_PLAY = `<circle cx="12" cy="12" r="10"/><polygon points="10 8 16 12 10 16 10 8"/>`;
+
+const SVG_BUS_WHITE = lucide("FFFFFF", PATH_BUS, 2);
+const SVG_BUS_BORGONA = lucide(BORGONA, PATH_BUS, 2);
+const SVG_BUS_ROSE = lucide(ROSE_500, PATH_BUS, 2);
+const SVG_INFO_BORGONA = lucide(BORGONA, PATH_INFO, 2);
+const SVG_PHONE_BORGONA = lucide(BORGONA, PATH_PHONE, 2);
+const SVG_COMPASS_BORGONA = lucide(BORGONA, PATH_COMPASS, 2);
+const SVG_MAPPIN_BORGONA = lucide(BORGONA, PATH_MAPPIN, 2);
+const SVG_CLOCK_BORGONA = lucide(BORGONA, PATH_CLOCK, 2);
+const SVG_CLOCK_AMBER = lucide("D97706", PATH_CLOCK, 2);
+const SVG_CHECK_EMERALD = lucide("34D399", PATH_CHECK, 2);
+const SVG_COMPASS_SKY = lucide("38BDF8", PATH_COMPASS, 2);
+const SVG_ACCESS_ROSE = lucide("FB7185", PATH_ACCESSIBILITY, 2);
+const SVG_AWARD_AMBER = lucide("F59E0B", PATH_AWARD, 2);
+const SVG_CHEVRON_WHITE = lucide("FFFFFF", PATH_CHEVRON_R, 2);
+
+// Mapa geográfico Mendoza → Ciudad Universitaria (recreación del SVG de recorrido.html)
+const SVG_GEO_MAP = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 450">
+  <rect width="900" height="450" fill="#c2e2cc"/>
+  <path d="M 50 50 L 300 30 L 450 150 L 300 420 L 50 400 Z" fill="#b9dfc4" opacity="0.6"/>
+  <path d="M 300 30 L 650 10 L 720 220 L 550 420 L 300 420 Z" fill="#b1dbbc" opacity="0.6"/>
+  <path d="M 650 10 L 900 10 L 900 320 L 720 320 L 720 220 Z" fill="#a7d6b3" opacity="0.5"/>
+  <path d="M 550 420 L 720 220 L 900 320 L 900 450 L 550 450 Z" fill="#add9b9" opacity="0.8"/>
+  <path d="M 720 220 C 760 220, 800 230, 830 250 L 900 250 L 900 450 L 850 450 C 800 410, 750 350, 720 320 Z" fill="#8cbde0"/>
+  <text x="800" y="300" font-family="Inter,sans-serif" font-size="11" font-weight="700" fill="#075985" opacity="0.6">Río de la Plata</text>
+  <path d="M 220 50 L 220 420" stroke="#FFFFFF" stroke-width="2.5" stroke-dasharray="6,4" opacity="0.7"/>
+  <path d="M 380 30 L 380 430" stroke="#FFFFFF" stroke-width="2.5" stroke-dasharray="6,4" opacity="0.7"/>
+  <path d="M 560 30 L 560 440" stroke="#FFFFFF" stroke-width="2.5" stroke-dasharray="6,4" opacity="0.7"/>
+  <path d="M 690 100 L 690 440" stroke="#FFFFFF" stroke-width="2.5" stroke-dasharray="6,4" opacity="0.7"/>
+  <text x="140" y="320" font-family="Inter,sans-serif" font-size="13" font-weight="800" fill="#3a6845" opacity="0.35" letter-spacing="1">MENDOZA</text>
+  <text x="300" y="280" font-family="Inter,sans-serif" font-size="13" font-weight="800" fill="#3a6845" opacity="0.35" letter-spacing="1">SAN LUIS</text>
+  <text x="470" y="140" font-family="Inter,sans-serif" font-size="13" font-weight="800" fill="#3a6845" opacity="0.35" letter-spacing="1">CÓRDOBA</text>
+  <text x="630" y="100" font-family="Inter,sans-serif" font-size="13" font-weight="800" fill="#3a6845" opacity="0.35" letter-spacing="1">SANTA FE</text>
+  <text x="620" y="380" font-family="Inter,sans-serif" font-size="13" font-weight="800" fill="#3a6845" opacity="0.35" letter-spacing="1">PROV. BUENOS AIRES</text>
+  <path d="M 160 210 Q 230 110, 310 120 T 430 180 T 590 150 T 670 170 T 730 230" fill="none" stroke="#5b57d6" stroke-width="5" stroke-linecap="round" stroke-linejoin="round" opacity="0.85"/>
+  <path d="M 160 210 Q 230 110, 310 120 T 430 180 T 590 150 T 670 170 T 730 230" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.9"/>
+  <path d="M 160 210 L 320 220 L 400 235 L 520 235 L 610 245 L 690 238 L 730 230" fill="none" stroke="#1d27db" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M 160 210 L 320 220 L 400 235 L 520 235 L 610 245 L 690 238 L 730 230" fill="none" stroke="#3b82f6" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  <circle cx="160" cy="210" r="10" fill="#FFFFFF" stroke="#333333" stroke-width="2"/>
+  <circle cx="160" cy="210" r="5" fill="#722F37"/>
+  <circle cx="320" cy="220" r="4" fill="#FFFFFF" stroke="#1d27db" stroke-width="2"/>
+  <circle cx="400" cy="235" r="4" fill="#FFFFFF" stroke="#1d27db" stroke-width="2"/>
+  <circle cx="610" cy="245" r="4" fill="#FFFFFF" stroke="#1d27db" stroke-width="2"/>
+  <circle cx="730" cy="230" r="12" fill="#ef4444" fill-opacity="0.25"/>
+  <circle cx="730" cy="230" r="8" fill="#ef4444" stroke="#FFFFFF" stroke-width="1.5"/>
+  <text x="160" y="240" text-anchor="middle" font-family="Inter,sans-serif" font-size="12" font-weight="800" fill="#262626">Mendoza</text>
+  <text x="320" y="245" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="700" fill="#404040">San Luis</text>
+  <text x="400" y="260" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="700" fill="#404040">Villa Mercedes</text>
+  <text x="610" y="270" text-anchor="middle" font-family="Inter,sans-serif" font-size="11" font-weight="700" fill="#404040">Junín</text>
+  <text x="745" y="222" text-anchor="start" font-family="Inter,sans-serif" font-size="12" font-weight="800" fill="#dc2626">Ciudad Universitaria</text>
+  <text x="745" y="236" text-anchor="start" font-family="Inter,sans-serif" font-size="10" font-weight="700" fill="#525252">Bs. As.</text>
+  <g transform="translate(230, 60)">
+    <rect x="1" y="1" width="135" height="38" rx="6" fill="#000000" opacity="0.15"/>
+    <rect width="135" height="38" rx="6" fill="#FFFFFF" stroke="#CCCCCC" stroke-width="1"/>
+    <text x="14" y="20" font-family="Inter,sans-serif" font-size="11" font-weight="800" fill="#4d7c0f">⏱ 14h 17min</text>
+    <text x="14" y="32" font-family="Inter,sans-serif" font-size="9" font-weight="700" fill="#737373">1.217 km (Alternativa)</text>
+  </g>
+  <g transform="translate(480, 270)">
+    <rect x="1" y="1" width="135" height="38" rx="6" fill="#000000" opacity="0.15"/>
+    <rect width="135" height="38" rx="6" fill="#FFFFFF" stroke="#1d27db" stroke-width="1.5"/>
+    <text x="14" y="20" font-family="Inter,sans-serif" font-size="11" font-weight="800" fill="#4d7c0f">⏱ 11h 49min</text>
+    <text x="14" y="32" font-family="Inter,sans-serif" font-size="9" font-weight="800" fill="#262626">1.085 km (Ruta 7)</text>
+  </g>
+</svg>`;
+
+// ─── SHARED SECTION: ACCESSIBILITY TOP BAR ───────────────────────────────────
+async function _accessBar(F, y) {
+  const H = 40;
+  rect(F, 0, y, FW, H, CORDILLERA);
+  rect(F, 0, y + H - 1, FW, 1, ROSE_900);
+  svgNode(F, SVG_ACCESS_ROSE, CX, y + 12, 16, 16);
+  await txt(F, CX + 22, y + 13, "MODO ACCESIBILIDAD WCAG 2.1:", SEMIBOLD, 12, ROSE_300, { spacing: 0.4 });
+  // Botones derecha
+  const bx2 = CX + CW - 138;
+  rect(F, bx2, y + 8, 130, 24, ZINC_700, { radius: 4 });
+  await txt(F, bx2, y + 13, "Texto Grande A+", BOLD, 11, BLANCO, { w: 130, align: "CENTER" });
+  const bx1 = bx2 - 148;
+  rect(F, bx1, y + 8, 140, 24, ZINC_700, { radius: 4 });
+  await txt(F, bx1, y + 13, "Alto Contraste ◑", BOLD, 11, BLANCO, { w: 140, align: "CENTER" });
+  return y + H;
+}
+
+// ─── SHARED SECTION: NAVBAR ──────────────────────────────────────────────────
+// active: "servicio" | "paradas" | "recorrido" | "horarios"
+// Devuelve { nextY, hotspots: { home, servicio, paradas, recorrido, horarios } }
+async function _navbar(F, y, active) {
+  const H = 96;
+  rect(F, 0, y, FW, H, BORGONA);
+  rect(F, 0, y + H - 4, FW, 4, BORGONA_DARK);
+
+  // Logo box (white)
+  rect(F, CX, y + 18, 60, 60, BLANCO, { radius: 12 });
+  svgNode(F, SVG_BUS_BORGONA, CX + 14, y + 32, 32, 32);
+
+  // Branding text
+  await txt(F, CX + 76, y + 24, "TIM", EXTRABOLD, 30, BLANCO, { spacing: -0.5 });
+  await txt(F, CX + 132, y + 36, "TERMINAL INTELIGENTE DE MENDOZA", SEMIBOLD, 11, ROSE_200, { spacing: 1.6 });
+  await txt(F, CX + 76, y + 60, "Nexo Studio — Conexión Federal", MEDIUM, 12, ROSE_100, { opacity: 0.9 });
+
+  // Logo hotspot (para volver a HOME)
+  const homeHot = hotspot(F, CX, y + 12, 350, 72, "hotspot-nav-home");
+
+  // Tabs nav
+  const tabs = [
+    { id: "servicio",  label: "Servicio" },
+    { id: "paradas",   label: "Paradas" },
+    { id: "recorrido", label: "Recorrido" },
+    { id: "horarios",  label: "Horarios" },
+  ];
+
+  // Render right-aligned
+  // First measure widths
+  const tabBoxW = 124;
+  const tabBoxH = 40;
+  const totalW = tabs.length * tabBoxW + (tabs.length - 1) * 8;
+  let tx = CX + CW - totalW;
+  const ty = y + 28;
+  const hs = { home: homeHot, servicio: null, paradas: null, recorrido: null, horarios: null };
+
+  for (const tab of tabs) {
+    const isActive = tab.id === active;
+    rect(F, tx, ty, tabBoxW, tabBoxH, isActive ? BLANCO : null, { radius: 8 });
+    if (isActive) {
+      // shadow effect simulada con borde leve
+      rect(F, tx, ty + tabBoxH, tabBoxW, 2, BORGONA_DEEP, { opacity: 0.3 });
+    }
+    await txt(F, tx, ty + 12, tab.label, BOLD, 14, isActive ? BORGONA : BLANCO, { w: tabBoxW, align: "CENTER" });
+    hs[tab.id] = hotspot(F, tx, ty, tabBoxW, tabBoxH, "hotspot-tab-" + tab.id);
+    tx += tabBoxW + 8;
+  }
+
+  return { nextY: y + H, hotspots: hs };
+}
+
+// ─── SHARED SECTION: SIDEBAR (Ficha + Asistencia) ────────────────────────────
+// La barra lateral ocupa col-span-4 (de 12). Ancho ≈ (CW * 4/12 - GAP) = 402
+const SIDEBAR_W = Math.floor((CW - 2 * GAP) * 4 / 12);
+const MAIN_W = CW - SIDEBAR_W - GAP;
+
+async function _sidebar(F, y) {
+  let cy = y;
+
+  // ── FICHA DEL SERVICIO ────────────────────────────────────────────────────
+  const fichaH = 360;
+  rect(F, CX, cy, SIDEBAR_W, fichaH, BLANCO, { radius: 16, stroke: NEUTRAL_200, sw: 1 });
+  svgNode(F, SVG_INFO_BORGONA, CX + 24, cy + 24, 24, 24);
+  await txt(F, CX + 58, cy + 26, "Ficha del Servicio", BOLD, 19, NEUTRAL_900, { spacing: -0.3 });
+
+  const items = [
+    ["Operador:", "Terminal Inteligente de Mendoza (TIM)", NEUTRAL_800, false],
+    ["Destino Central:", "Ciudad Universitaria, CABA", BORGONA, true],
+    ["Distancia aproximada:", "1.085 km (Ruta Nacional 7)", NEUTRAL_800, false],
+    ["Tiempo de viaje:", "11 horas 49 minutos aprox.", NEUTRAL_800, false],
+    ["Frecuencia diaria:", "5 servicios al día", EMERALD_600, true],
+  ];
+
+  let iy = cy + 76;
+  for (let i = 0; i < items.length; i++) {
+    const [label, value, color, bold] = items[i];
+    await txt(F, CX + 24, iy + 4, label, REGULAR, 13, NEUTRAL_500);
+    const valNode = await txt(F, CX + 24, iy + 4, value, SEMIBOLD, 13, color);
+    valNode.x = CX + SIDEBAR_W - 24 - valNode.width;
+    if (i < items.length - 1) rect(F, CX + 24, iy + 36, SIDEBAR_W - 48, 1, NEUTRAL_100);
+    iy += 48;
+  }
+  cy += fichaH + 24;
+
+  // ── ASISTENCIA TIM ────────────────────────────────────────────────────────
+  const asisH = 180;
+  rect(F, CX, cy, SIDEBAR_W, asisH, ROSE_50, { radius: 16, stroke: BORGONA, sw: 2, strokeAlign: "INSIDE" });
+  svgNode(F, SVG_PHONE_BORGONA, CX + 24, cy + 24, 20, 20);
+  await txt(F, CX + 52, cy + 22, "Asistencia TIM 24/7", BLACK, 17, NEUTRAL_900, { spacing: -0.2 });
+  const desc = await txt(F, CX + 24, cy + 60,
+    "Si requerís asistencia prioritaria, rampas de abordaje especiales o ayuda visual al momento de abordar, podés comunicarte sin costo:",
+    REGULAR, 12, NEUTRAL_600);
+  desc.textAutoResize = "HEIGHT";
+  desc.resize(SIDEBAR_W - 48, desc.height);
+  // Botón llamada
+  rect(F, CX + 24, cy + asisH - 56, SIDEBAR_W - 48, 40, BORGONA, { radius: 12 });
+  await txt(F, CX + 24, cy + asisH - 44, "Llamar al: 0261 476-5875", BOLD, 13, BLANCO, { w: SIDEBAR_W - 48, align: "CENTER" });
+  cy += asisH;
+
+  return cy;
+}
+
+// ─── SHARED SECTION: FOOTER ──────────────────────────────────────────────────
+async function _footer(F, y) {
+  const H = 280;
+  rect(F, 0, y, FW, H, CORDILLERA);
+
+  // Col 1: brand
+  svgNode(F, SVG_BUS_ROSE, CX, y + 48, 24, 24);
+  await txt(F, CX + 32, y + 46, "TIM", BLACK, 26, BLANCO, { spacing: -0.5 });
+  const brandDesc = await txt(F, CX, y + 86,
+    "Terminal Inteligente de Mendoza. Sistema Integrado de Conectividad Nacional y Universitaria.",
+    REGULAR, 12, NEUTRAL_400);
+  brandDesc.textAutoResize = "HEIGHT";
+  brandDesc.resize(220, brandDesc.height);
+
+  // Col 2: Líneas de Servicio
+  const col2x = CX + 320;
+  await txt(F, col2x, y + 48, "LÍNEAS DE SERVICIO", BOLD, 12, ROSE_400, { spacing: 1.2 });
+  const lineas = [
+    ["Línea 1: Larga Distancia",       NEUTRAL_400, false],
+    ["Línea 2: Alta Montaña",          NEUTRAL_400, false],
+    ["Línea 3: Ruta del Vino",         NEUTRAL_400, false],
+    ["Línea 5: Universitario (CABA)",  BLANCO,      true],
+  ];
+  for (let i = 0; i < lineas.length; i++) {
+    await txt(F, col2x, y + 84 + i * 24, lineas[i][0], lineas[i][2] ? SEMIBOLD : REGULAR, 12, lineas[i][1]);
+  }
+
+  // Col 3: Ubicación
+  const col3x = CX + 640;
+  await txt(F, col3x, y + 48, "UBICACIÓN", BOLD, 12, ROSE_400, { spacing: 1.2 });
+  const ub = await txt(F, col3x, y + 84,
+    "Juan B. Alberdi s/n, Guaymallén, Mendoza, Argentina. RN7.",
+    REGULAR, 12, NEUTRAL_400);
+  ub.textAutoResize = "HEIGHT";
+  ub.resize(220, ub.height);
+
+  // Col 4: Desarrollo
+  const col4x = CX + 960;
+  await txt(F, col4x, y + 48, "DESARROLLO", BOLD, 12, ROSE_400, { spacing: 1.2 });
+  await txt(F, col4x, y + 84, "Nexo Studio — UADE 2026.", REGULAR, 12, NEUTRAL_400);
+
+  // Línea divisoria
+  rect(F, CX, y + 200, CW, 1, ZINC_800);
+
+  // Copyright + WCAG
+  await txt(F, CX, y + 220, "© 2026 Terminal Inteligente de Mendoza (TIM).", REGULAR, 11, NEUTRAL_500);
+  const wcag = await txt(F, CX, y + 220, "Normas WCAG 2.1 AA", REGULAR, 11, NEUTRAL_500);
+  wcag.x = CX + CW - wcag.width;
+
+  return y + H;
+}
+
+// ─── SECTION: HERO (solo Servicio/index) ─────────────────────────────────────
+async function _heroServicio(F, y) {
+  const H = 480;
+  // Gradient simulado: rectángulo principal borgona + capa borgona_deep con opacity gradient
+  rect(F, 0, y, FW, H, BORGONA);
+  rect(F, FW * 0.5, y, FW * 0.5, H, BORGONA_DEEP, { opacity: 0.7 });
+  rect(F, FW * 0.6, y, FW * 0.4, H, BORGONA_DEEP, { opacity: 0.6 });
+
+  // ── LADO IZQUIERDO ────────────────────────────────────────────────────────
+  // Badge
+  rect(F, CX, y + 56, 460, 32, ROSE_500, { radius: 100 });
+  await txt(F, CX, y + 64, "LÍNEA 5: TRANSPORTE UNIVERSITARIO FEDERAL", BLACK, 11, BLANCO, { w: 460, align: "CENTER", spacing: 1.5 });
+
+  // H1
+  await txt(F, CX, y + 110, "Mendoza", BLACK, 56, BLANCO, { spacing: -1 });
+  await txt(F, CX + 256, y + 110, "↔", BLACK, 56, ROSE_300, { spacing: -1 });
+  await txt(F, CX + 320, y + 110, "Ciudad Universitaria", BLACK, 56, BLANCO, { spacing: -1 });
+  await txt(F, CX, y + 178, "Buenos Aires", BLACK, 56, BLANCO, { spacing: -1 });
+
+  // Subtitle
+  const sub = await txt(F, CX, y + 256,
+    "El servicio directo de la Terminal Inteligente de Mendoza (TIM) diseñado para conectar de manera rápida, accesible y cómoda a estudiantes, docentes y profesionales con el mayor campus urbano científico-educativo del país.",
+    REGULAR, 16, BLANCO, { opacity: 0.92, lh: 26 });
+  sub.textAutoResize = "HEIGHT";
+  sub.resize(620, sub.height);
+
+  // Badges (100% Accesible / Servicio Directo)
+  const by = y + 380;
+  // Badge 1
+  rect(F, CX, by, 168, 48, BLANCO, { radius: 12, opacity: 0.14 });
+  svgNode(F, SVG_CHECK_EMERALD, CX + 14, by + 14, 20, 20);
+  await txt(F, CX + 42, by + 16, "100% Accesible", SEMIBOLD, 13, BLANCO);
+  // Badge 2
+  rect(F, CX + 184, by, 332, 48, BLANCO, { radius: 12, opacity: 0.14 });
+  svgNode(F, SVG_COMPASS_SKY, CX + 198, by + 14, 20, 20);
+  await txt(F, CX + 226, by + 16, "Servicio Directo sin escalas intermedias", SEMIBOLD, 13, BLANCO);
+
+  // ── LADO DERECHO: PRÓXIMO SERVICIO CARD ───────────────────────────────────
+  const cardX = CX + CW - 460;
+  const cardY = y + 56;
+  const cardW = 460;
+  const cardH = 368;
+  rect(F, cardX, cardY, cardW, cardH, BLANCO, { radius: 20 });
+
+  // Encabezado tarjeta
+  await txt(F, cardX + 24, cardY + 24, "ESTADO DE FRECUENCIAS", BLACK, 11, BORGONA, { spacing: 1.4 });
+  // Indicador live (puntito emerald con halo)
+  rect(F, cardX + cardW - 36, cardY + 26, 12, 12, EMERALD_500, { radius: 12 });
+  rect(F, cardX + cardW - 40, cardY + 22, 20, 20, EMERALD_400, { radius: 20, opacity: 0.4 });
+
+  // Próxima partida label
+  await txt(F, cardX + 24, cardY + 58, "Próxima partida programada:", MEDIUM, 12, NEUTRAL_500);
+
+  // Hora grande
+  await txt(F, cardX + 24, cardY + 80, "15:00 hs", EXTRABOLD, 40, NEUTRAL_900, { spacing: -1 });
+  // Badge Activo
+  rect(F, cardX + 174, cardY + 100, 64, 22, EMERALD_50, { radius: 100 });
+  await txt(F, cardX + 174, cardY + 105, "Activo", SEMIBOLD, 11, EMERALD_600, { w: 64, align: "CENTER" });
+
+  // Banner countdown
+  const banY = cardY + 144;
+  rect(F, cardX + 24, banY, cardW - 48, 80, AMBER_50, { radius: 16, stroke: AMBER_200, sw: 1 });
+  svgNode(F, SVG_CLOCK_AMBER, cardX + 40, banY + 28, 24, 24);
+  await txt(F, cardX + 76, banY + 18, "TIEMPO RESTANTE PARA ABORDAR:", BOLD, 11, AMBER_800, { spacing: 0.6 });
+  await txt(F, cardX + 76, banY + 40, "2h 34m", BOLD, 18, AMBER_950);
+
+  // Stats grid (Andén / Frecuencia)
+  const sgY = banY + 96;
+  rect(F, cardX + 24, sgY, (cardW - 56) / 2, 56, NEUTRAL_100, { radius: 10 });
+  await txt(F, cardX + 24, sgY + 12, "Andén Asignado", BOLD, 12, NEUTRAL_800, { w: (cardW - 56) / 2, align: "CENTER" });
+  await txt(F, cardX + 24, sgY + 32, "Andén 7", REGULAR, 12, NEUTRAL_600, { w: (cardW - 56) / 2, align: "CENTER" });
+
+  rect(F, cardX + 32 + (cardW - 56) / 2, sgY, (cardW - 56) / 2, 56, NEUTRAL_100, { radius: 10 });
+  await txt(F, cardX + 32 + (cardW - 56) / 2, sgY + 12, "Frecuencia Estándar", BOLD, 12, NEUTRAL_800, { w: (cardW - 56) / 2, align: "CENTER" });
+  await txt(F, cardX + 32 + (cardW - 56) / 2, sgY + 32, "Cada 5 Horas", REGULAR, 12, NEUTRAL_600, { w: (cardW - 56) / 2, align: "CENTER" });
+
+  // CTA
+  const ctaY = sgY + 72;
+  rect(F, cardX + 24, ctaY, cardW - 48, 48, BORGONA, { radius: 12 });
+  await txt(F, cardX + 24, ctaY + 16, "Ver todas las salidas  →", BOLD, 14, BLANCO, { w: cardW - 48, align: "CENTER" });
+
+  return y + H;
+}
+
+// ─── SECTION: CENTRAL — SERVICIO ─────────────────────────────────────────────
+async function _centralServicio(F, y) {
+  const mainX = CX + SIDEBAR_W + GAP;
+  let cy = y;
+  const padding = 32;
+
+  // Calculamos altura aprox del card central
+  const cardH = 760;
+  rect(F, mainX, cy, MAIN_W, cardH, BLANCO, { radius: 16, stroke: NEUTRAL_200, sw: 1 });
+
+  // Encabezado
+  svgNode(F, SVG_BUS_BORGONA, mainX + padding, cy + padding, 32, 32);
+  await txt(F, mainX + padding + 48, cy + padding, "1. Información del Servicio", BOLD, 22, NEUTRAL_900, { spacing: -0.4 });
+  await txt(F, mainX + padding + 48, cy + padding + 30, "Conexión de larga distancia inteligente de Mendoza a CABA", REGULAR, 13, NEUTRAL_500);
+  rect(F, mainX + padding, cy + padding + 64, MAIN_W - 2 * padding, 1, NEUTRAL_200);
+
+  // Paragraph
+  const pY = cy + padding + 88;
+  const par = await txt(F, mainX + padding, pY,
+    "La Terminal Inteligente de Mendoza (TIM) pone a disposición su servicio premium de transporte de larga distancia, uniendo la capital cuyana con el núcleo estudiantil más grande del Área Metropolitana de Buenos Aires.",
+    REGULAR, 15, NEUTRAL_700, { lh: 26 });
+  par.textAutoResize = "HEIGHT";
+  par.resize(MAIN_W - 2 * padding, par.height);
+
+  // Sub-cards (Nombre Oficial / Destino)
+  const subY = pY + 110;
+  const subW = (MAIN_W - 2 * padding - 16) / 2;
+  rect(F, mainX + padding, subY, subW, 110, ROSE_50, { radius: 12, stroke: ROSE_100, sw: 1 });
+  await txt(F, mainX + padding + 16, subY + 16, "Nombre Oficial", BOLD, 14, BORGONA);
+  const so1 = await txt(F, mainX + padding + 16, subY + 40,
+    "Terminal Inteligente de Mendoza (TIM) - Línea 5 Transporte Universitario",
+    REGULAR, 13, NEUTRAL_700, { lh: 20 });
+  so1.textAutoResize = "HEIGHT";
+  so1.resize(subW - 32, so1.height);
+
+  rect(F, mainX + padding + subW + 16, subY, subW, 110, ROSE_50, { radius: 12, stroke: ROSE_100, sw: 1 });
+  await txt(F, mainX + padding + subW + 32, subY + 16, "Destino Principal", BOLD, 14, BORGONA);
+  const so2 = await txt(F, mainX + padding + subW + 32, subY + 40,
+    "Estación Ciudad Universitaria, Núñez, Ciudad Autónoma de Buenos Aires, Argentina",
+    REGULAR, 13, NEUTRAL_700, { lh: 20 });
+  so2.textAutoResize = "HEIGHT";
+  so2.resize(subW - 32, so2.height);
+
+  // Beneficios
+  const benY = subY + 130;
+  const benH = 168;
+  rect(F, mainX + padding, benY, MAIN_W - 2 * padding, benH, NEUTRAL_50, { radius: 12, stroke: NEUTRAL_100, sw: 1 });
+  svgNode(F, SVG_AWARD_AMBER, mainX + padding + 16, benY + 16, 20, 20);
+  await txt(F, mainX + padding + 44, benY + 18, "Beneficios para Estudiantes y Docentes:", BOLD, 14, NEUTRAL_800);
+
+  const benefits = [
+    "Descuento del 20% presentando libreta universitaria o constancia de alumno regular.",
+    "Conectividad Wi-Fi de alta velocidad para estudiar a bordo.",
+    "Puertos USB independientes en cada asiento.",
+    "Coche-cama y semicama con espacios totalmente adaptados para sillas de ruedas.",
+  ];
+  for (let i = 0; i < benefits.length; i++) {
+    rect(F, mainX + padding + 18, benY + 56 + i * 24 + 6, 4, 4, NEUTRAL_500, { radius: 4 });
+    await txt(F, mainX + padding + 30, benY + 56 + i * 24, benefits[i], REGULAR, 13, NEUTRAL_600);
+  }
+
+  // Imagen referencia (placeholder)
+  const imgY = benY + benH + 24;
+  const imgH = 200;
+  rect(F, mainX + padding, imgY, MAIN_W - 2 * padding, imgH, NEUTRAL_300, { radius: 12 });
+  // overlay gradiente abajo
+  rect(F, mainX + padding, imgY + imgH - 80, MAIN_W - 2 * padding, 80, NEUTRAL_900, { opacity: 0.6, radius: 12 });
+  await txt(F, mainX + padding + 16, imgY + imgH - 64, "FLOTA TIM 2026", BLACK, 11, ROSE_300, { spacing: 1.4 });
+  await txt(F, mainX + padding + 16, imgY + imgH - 44, "Unidades doble piso equipadas con tecnología de última generación y rampas automáticas.", MEDIUM, 13, BLANCO);
+
+  return cy + cardH;
+}
+
+// ─── SECTION: CENTRAL — PARADAS ──────────────────────────────────────────────
+async function _centralParadas(F, y) {
+  const mainX = CX + SIDEBAR_W + GAP;
+  let cy = y;
+  const padding = 32;
+  const cardH = 760;
+  rect(F, mainX, cy, MAIN_W, cardH, BLANCO, { radius: 16, stroke: NEUTRAL_200, sw: 1 });
+
+  // Encabezado
+  svgNode(F, SVG_MAPPIN_BORGONA, mainX + padding, cy + padding, 32, 32);
+  await txt(F, mainX + padding + 48, cy + padding, "2. Paradas y Estaciones", BOLD, 22, NEUTRAL_900, { spacing: -0.4 });
+  await txt(F, mainX + padding + 48, cy + padding + 30, "Punto único estratégico de arribo y partida", REGULAR, 13, NEUTRAL_500);
+  rect(F, mainX + padding, cy + padding + 64, MAIN_W - 2 * padding, 1, NEUTRAL_200);
+
+  // Paragraph
+  const pY = cy + padding + 88;
+  const par = await txt(F, mainX + padding, pY,
+    "Para garantizar la rapidez del servicio interprovincial directo sin escalas intermedias, se ha fijado una Parada Única Federal de descenso y ascenso en Ciudad Universitaria de Buenos Aires.",
+    REGULAR, 15, NEUTRAL_700, { lh: 26 });
+  par.textAutoResize = "HEIGHT";
+  par.resize(MAIN_W - 2 * padding, par.height);
+
+  // Parada Única banner
+  const banY = pY + 90;
+  const banH = 140;
+  rect(F, mainX + padding, banY, MAIN_W - 2 * padding, banH, ROSE_50, { radius: 16, stroke: ROSE_200, sw: 1 });
+  await txt(F, mainX + padding + 20, banY + 18, "Parada Única: Ciudad Universitaria (UBA)", BOLD, 17, BORGONA);
+  // Badge
+  const badgeText = "Terminal Exclusiva";
+  rect(F, mainX + padding + (MAIN_W - 2 * padding) - 156, banY + 18, 132, 24, EMERALD_100, { radius: 100 });
+  await txt(F, mainX + padding + (MAIN_W - 2 * padding) - 156, banY + 23, badgeText, BOLD, 11, EMERALD_800, { w: 132, align: "CENTER" });
+
+  const banDesc = await txt(F, mainX + padding + 20, banY + 52,
+    "Es un campus urbano de la Universidad de Buenos Aires (UBA), sede de sus facultades de Arquitectura, Diseño y Urbanismo (FADU), Ciencias Exactas y Naturales (FCEyN), el Instituto de Astronomía y Física del Espacio (IAFE) y el Instituto de Geocronología y Geología Isotópica (INGEIS).",
+    REGULAR, 13, NEUTRAL_600, { lh: 22 });
+  banDesc.textAutoResize = "HEIGHT";
+  banDesc.resize(MAIN_W - 2 * padding - 40, banDesc.height);
+
+  // Pabellones (2 cards)
+  const pabY = banY + banH + 24;
+  const pabW = (MAIN_W - 2 * padding - 16) / 2;
+  const pabH = 130;
+  // Card I
+  rect(F, mainX + padding, pabY, pabW, pabH, NEUTRAL_50, { radius: 12, stroke: NEUTRAL_200, sw: 1 });
+  await txt(F, mainX + padding + 20, pabY + 20, "Pabellón I: Exactas y Ciencias", BOLD, 15, NEUTRAL_900);
+  const pab1Desc = await txt(F, mainX + padding + 20, pabY + 50,
+    "Alberga departamentos científicos como computación, física, matemática, así como laboratorios y centros nacionales del CONICET.",
+    REGULAR, 12, NEUTRAL_500, { lh: 18 });
+  pab1Desc.textAutoResize = "HEIGHT";
+  pab1Desc.resize(pabW - 40, pab1Desc.height);
+
+  // Card II/III
+  rect(F, mainX + padding + pabW + 16, pabY, pabW, pabH, NEUTRAL_50, { radius: 12, stroke: NEUTRAL_200, sw: 1 });
+  await txt(F, mainX + padding + pabW + 36, pabY + 20, "Pabellones II y III: FADU", BOLD, 15, NEUTRAL_900);
+  const pab2Desc = await txt(F, mainX + padding + pabW + 36, pabY + 50,
+    "Núcleo académico del diseño de vanguardia. Concentra a miles de estudiantes de arquitectura, diseño gráfico e industrial, y geociencias.",
+    REGULAR, 12, NEUTRAL_500, { lh: 18 });
+  pab2Desc.textAutoResize = "HEIGHT";
+  pab2Desc.resize(pabW - 40, pab2Desc.height);
+
+  // Imagen campus
+  const imgY = pabY + pabH + 24;
+  const imgH = 180;
+  rect(F, mainX + padding, imgY, MAIN_W - 2 * padding, imgH, NEUTRAL_300, { radius: 12, stroke: NEUTRAL_200, sw: 1 });
+  rect(F, mainX + padding, imgY, MAIN_W - 2 * padding, imgH, NEUTRAL_900, { opacity: 0.4, radius: 12 });
+  await txt(F, mainX + padding + 20, imgY + imgH - 36, "Campus Abierto de Núñez: Conexión clave para proyectos interuniversitarios nacionales.", SEMIBOLD, 13, BLANCO);
+
+  return cy + cardH;
+}
+
+// ─── SECTION: CENTRAL — RECORRIDO ────────────────────────────────────────────
+async function _centralRecorrido(F, y) {
+  const mainX = CX + SIDEBAR_W + GAP;
+  let cy = y;
+  const padding = 32;
+  const cardH = 760;
+  rect(F, mainX, cy, MAIN_W, cardH, BLANCO, { radius: 16, stroke: NEUTRAL_200, sw: 1 });
+
+  // Encabezado
+  svgNode(F, SVG_COMPASS_BORGONA, mainX + padding, cy + padding, 32, 32);
+  await txt(F, mainX + padding + 48, cy + padding, "3. Recorrido Geográfico y Ubicación", BOLD, 22, NEUTRAL_900, { spacing: -0.4 });
+  await txt(F, mainX + padding + 48, cy + padding + 30, "Traza oficial de la Ruta Nacional 7 Mendoza ↔ Ciudad Universitaria (CABA)", REGULAR, 13, NEUTRAL_500);
+  rect(F, mainX + padding, cy + padding + 64, MAIN_W - 2 * padding, 1, NEUTRAL_200);
+
+  // Address banner (left-border)
+  const adrY = cy + padding + 88;
+  const adrH = 84;
+  rect(F, mainX + padding, adrY, 4, adrH, ROSE_500);
+  await txt(F, mainX + padding + 16, adrY + 4, "DIRECCIÓN DE LLEGADA EN BUENOS AIRES:", BOLD, 10, NEUTRAL_400, { spacing: 1.4 });
+  await txt(F, mainX + padding + 16, adrY + 22, "Av. Intendente Güiraldes 2160, Pabellones I, II y III", BOLD, 16, NEUTRAL_900);
+  await txt(F, mainX + padding + 16, adrY + 48, "Barrio de Núñez, zona norte de la Ciudad de Buenos Aires", REGULAR, 12, NEUTRAL_500);
+  // Badge derecha
+  rect(F, mainX + padding + (MAIN_W - 2 * padding) - 132, adrY + 24, 132, 28, BORGONA, { radius: 100 });
+  await txt(F, mainX + padding + (MAIN_W - 2 * padding) - 132, adrY + 31, "Ruta Nacional 7", BOLD, 11, BLANCO, { w: 132, align: "CENTER" });
+
+  // Map container
+  const mapBoxY = adrY + adrH + 16;
+  const mapBoxH = cardH - (mapBoxY - cy) - padding - 60;
+  rect(F, mainX + padding, mapBoxY, MAIN_W - 2 * padding, mapBoxH, SLATE_50, { radius: 16, stroke: NEUTRAL_200, sw: 1 });
+  // Header tag
+  await txt(F, mainX + padding + 20, mapBoxY + 18, "VISUALIZACIÓN DE TRÁNSITO EN TIEMPO REAL", BLACK, 11, BORGONA, { spacing: 1.4 });
+  rect(F, mainX + padding + (MAIN_W - 2 * padding) - 124, mapBoxY + 14, 100, 22, "DBEAFE", { radius: 100 });
+  await txt(F, mainX + padding + (MAIN_W - 2 * padding) - 124, mapBoxY + 18, "Mapa GPS", BOLD, 10, "1E40AF", { w: 100, align: "CENTER" });
+
+  // SVG geográfico
+  const svgY = mapBoxY + 48;
+  const svgH = mapBoxH - 100;
+  const svgW = MAIN_W - 2 * padding - 32;
+  rect(F, mainX + padding + 16, svgY, svgW, svgH, BLANCO, { radius: 12 });
+  svgNode(F, SVG_GEO_MAP, mainX + padding + 16, svgY, svgW, svgH);
+
+  // Referencias
+  const refY = svgY + svgH + 12;
+  rect(F, mainX + padding + 20, refY + 6, 16, 8, "3B82F6", { radius: 2 });
+  await txt(F, mainX + padding + 44, refY + 4, "Ruta Principal (RN 7) - 11h 49m", REGULAR, 11, NEUTRAL_500);
+  rect(F, mainX + padding + 246, refY + 6, 16, 8, "A78BFA", { radius: 2 });
+  await txt(F, mainX + padding + 270, refY + 4, "Ruta Alternativa Norte - 14h 17m", REGULAR, 11, NEUTRAL_500);
+
+  return cy + cardH;
+}
+
+// ─── SECTION: CENTRAL — HORARIOS ─────────────────────────────────────────────
+const HORARIOS = [
+  { id: 1, hora: "00:00", estado: "Salido",     plat: "Andén 7 - Plataforma A" },
+  { id: 2, hora: "05:00", estado: "Salido",     plat: "Andén 7 - Plataforma A" },
+  { id: 3, hora: "10:00", estado: "A tiempo",   plat: "Andén 7 - Plataforma B" },
+  { id: 4, hora: "15:00", estado: "Programado", plat: "Andén 7 - Plataforma B" },
+  { id: 5, hora: "20:00", estado: "Programado", plat: "Andén 7 - Plataforma B" },
+];
+
+async function _centralHorarios(F, y) {
+  const mainX = CX + SIDEBAR_W + GAP;
+  let cy = y;
+  const padding = 32;
+  const cardH = 760;
+  rect(F, mainX, cy, MAIN_W, cardH, BLANCO, { radius: 16, stroke: NEUTRAL_200, sw: 1 });
+
+  // Encabezado
+  svgNode(F, SVG_CLOCK_BORGONA, mainX + padding, cy + padding, 32, 32);
+  await txt(F, mainX + padding + 48, cy + padding, "4. Horarios y Frecuencias", BOLD, 22, NEUTRAL_900, { spacing: -0.4 });
+  await txt(F, mainX + padding + 48, cy + padding + 30, "Cronograma de partidas diarias (Lunes a Domingos)", REGULAR, 13, NEUTRAL_500);
+  rect(F, mainX + padding, cy + padding + 64, MAIN_W - 2 * padding, 1, NEUTRAL_200);
+
+  // Banner Frecuencia
+  const freY = cy + padding + 88;
+  const freH = 80;
+  rect(F, mainX + padding, freY, MAIN_W - 2 * padding, freH, EMERALD_50, { radius: 12, stroke: EMERALD_100, sw: 1 });
+  await txt(F, mainX + padding + 20, freY + 16, "FRECUENCIA GENERAL:", BOLD, 10, EMERALD_800, { spacing: 1.4 });
+  await txt(F, mainX + padding + 20, freY + 36, "Un coche cada 5 horas", BLACK, 18, EMERALD_950);
+  rect(F, mainX + padding + (MAIN_W - 2 * padding) - 132, freY + 28, 112, 28, EMERALD_600, { radius: 100 });
+  await txt(F, mainX + padding + (MAIN_W - 2 * padding) - 132, freY + 35, "100% Puntual", BOLD, 11, BLANCO, { w: 112, align: "CENTER" });
+
+  // Tabla
+  const tabY = freY + freH + 16;
+  const tabW = MAIN_W - 2 * padding;
+  const headerH = 44;
+  const rowH = 56;
+  const tabH = headerH + HORARIOS.length * rowH;
+  rect(F, mainX + padding, tabY, tabW, tabH, BLANCO, { radius: 12, stroke: NEUTRAL_200, sw: 1 });
+
+  // Columnas: Servicio (140) / Hora (160) / Frecuencia (140) / Andén (220) / Estado (resto)
+  const COLS = [
+    { x: 0, w: 140, label: "SERVICIO" },
+    { x: 140, w: 160, label: "HORA DE SALIDA" },
+    { x: 300, w: 140, label: "FRECUENCIA" },
+    { x: 440, w: 220, label: "ANDÉN" },
+    { x: 660, w: tabW - 660, label: "ESTADO" },
+  ];
+
+  // Header
+  rect(F, mainX + padding, tabY, tabW, headerH, NEUTRAL_50);
+  rect(F, mainX + padding, tabY + headerH - 1, tabW, 1, NEUTRAL_200);
+  for (const c of COLS) {
+    await txt(F, mainX + padding + c.x + 24, tabY + 16, c.label, BOLD, 10, NEUTRAL_500, { spacing: 1.4 });
+  }
+
+  // Rows
+  for (let i = 0; i < HORARIOS.length; i++) {
+    const row = HORARIOS[i];
+    const ry = tabY + headerH + i * rowH;
+    if (i < HORARIOS.length - 1) rect(F, mainX + padding + 16, ry + rowH - 1, tabW - 32, 1, NEUTRAL_100);
+
+    // Servicio
+    await txt(F, mainX + padding + COLS[0].x + 24, ry + 20, "Micro " + row.id, BOLD, 14, BORGONA);
+    // Hora
+    await txt(F, mainX + padding + COLS[1].x + 24, ry + 18, row.hora + " hs", BOLD, 16, NEUTRAL_900);
+    // Frecuencia
+    await txt(F, mainX + padding + COLS[2].x + 24, ry + 20, "Cada 5 Horas", REGULAR, 13, NEUTRAL_500);
+    // Andén
+    await txt(F, mainX + padding + COLS[3].x + 24, ry + 20, row.plat, REGULAR, 13, NEUTRAL_700);
+    // Estado badge
+    let bgC, fgC;
+    if (row.estado === "Salido") { bgC = NEUTRAL_100; fgC = NEUTRAL_500; }
+    else if (row.estado === "A tiempo") { bgC = AMBER_100; fgC = AMBER_800; }
+    else { bgC = EMERALD_100; fgC = EMERALD_800; }
+    const badgeX = mainX + padding + COLS[4].x + 24;
+    const badgeW = 100;
+    rect(F, badgeX, ry + 16, badgeW, 24, bgC, { radius: 100 });
+    await txt(F, badgeX, ry + 21, row.estado, BOLD, 11, fgC, { w: badgeW, align: "CENTER" });
+  }
+
+  // Footnote
+  await txt(F, mainX + padding, tabY + tabH + 18,
+    "* Los horarios de arribo previstos en Ciudad Universitaria son estimaciones sujetas al tráfico en el ingreso a la Capital Federal.",
+    REGULAR, 11, NEUTRAL_400);
+
+  return cy + cardH;
+}
+
+// ─── FRAME BUILDERS ──────────────────────────────────────────────────────────
+async function buildFrame(name, x, activeTab, centralFn, withHero) {
+  const page = figma.currentPage;
+  // Remove existing
+  page.findChildren(n => n.name === name).forEach(n => n.remove());
+
+  const F = figma.createFrame();
+  F.name = name;
+  F.x = x; F.y = 0;
+  F.resize(FW, 100);
+  F.fills = [{ type: "SOLID", color: hexRGB(BG_GRAY) }];
+  F.clipsContent = false;
+  page.appendChild(F);
+
+  let y = 0;
+  y = await _accessBar(F, y);
+  const navResult = await _navbar(F, y, activeTab);
+  y = navResult.nextY;
+
+  let mainY = y;
+  if (withHero) {
+    mainY = await _heroServicio(F, mainY);
+  }
+
+  // Main grid: sidebar + central (con padding vertical de 48px)
+  mainY += 48;
+  const sidebarStartY = mainY;
+  const centralStartY = mainY;
+
+  // Render sidebar
+  await _sidebar(F, sidebarStartY);
+
+  // Render central
+  const afterCentralY = await centralFn(F, centralStartY);
+
+  // Padding bottom
+  let endY = afterCentralY + 48;
+
+  // Footer
+  endY = await _footer(F, endY);
+
+  F.resize(FW, endY);
+  return { frame: F, hotspots: navResult.hotspots };
+}
+
+// ─── PROTOTYPE CONNECTIONS ───────────────────────────────────────────────────
+function makeNav(node, destId) {
+  try {
+    node.reactions = [{
+      trigger: { type: "ON_CLICK" },
+      actions: [{
+        type: "NODE",
+        destinationId: destId,
+        navigation: "NAVIGATE",
+        transition: null,
+        preserveScrollPosition: false
+      }]
+    }];
+    return true;
+  } catch (e) {
+    post({ type: "log", text: "    ERR reactions: " + e.message });
+    return false;
+  }
+}
+
+// Conecta tabs internas de cada frame Universitario a sus pares
+function wireUniversitarioTabs(frames) {
+  const ids = {
+    servicio:  frames.servicio.id,
+    paradas:   frames.paradas.id,
+    recorrido: frames.recorrido.id,
+    horarios:  frames.horarios.id,
+  };
+  const order = ["servicio", "paradas", "recorrido", "horarios"];
+  let count = 0;
+  for (const key of order) {
+    const f = frames[key];
+    const hs = frames[key + "_hs"];
+    for (const target of order) {
+      if (target === key) continue;
+      const hot = hs[target];
+      if (hot && makeNav(hot, ids[target])) count++;
+    }
+  }
+  post({ type: "log", text: "  Tabs internas: " + count + " conexiones" });
+  return count;
+}
+
+// Conecta HOME → SERVICIO (click "Universitario" en HOME navbar)
+function connectHomeToUniversitario(homeFrame, servicioFrame) {
+  if (!homeFrame) {
+    post({ type: "log", text: "  HOME no encontrado — saltando HOME → CIUDAD UNIV." });
+    return;
+  }
+
+  let linked = 0;
+
+  // Estrategia 1: hotspot nombrado en HOME
+  const homeHotspot = homeFrame.findOne(n => n.name === "hotspot-nav-universitario");
+  if (homeHotspot) {
+    if (makeNav(homeHotspot, servicioFrame.id)) linked++;
+    post({ type: "log", text: "  HOME → CIUDAD UNIV via hotspot: " + linked });
+  }
+
+  // Estrategia 2: text node con "Universitario"
+  const textNodes = homeFrame.findAll(n => n.type === "TEXT" && n.characters === "Universitario");
+  post({ type: "log", text: "  HOME: text 'Universitario' encontrados: " + textNodes.length });
+  for (const n of textNodes) {
+    if (makeNav(n, servicioFrame.id)) linked++;
+  }
+
+  // Estrategia 3: si no se encontró nada, crear hotspot estimado sobre el navbar
+  if (linked === 0) {
+    post({ type: "log", text: "  Creando hotspot estimado en HOME sobre area navbar Universitario..." });
+    const hs = figma.createRectangle();
+    hs.name = "hotspot-nav-universitario";
+    hs.fills = [];
+    hs.opacity = 0.01;
+    // En el navbar del HOME (mismo patrón que LD) los links comienzan en x≈350
+    // Orden: Larga Distancia (350), Alta Montaña (~500), Ruta del Vino (~625),
+    // Aeropuerto (~755), Universitario (~862). El nav tiene y=16, alto≈52.
+    hs.x = 850; hs.y = 12;
+    hs.resize(150, 56);
+    homeFrame.appendChild(hs);
+    if (makeNav(hs, servicioFrame.id)) {
+      post({ type: "log", text: "  Hotspot 'Universitario' creado en HOME: OK" });
+      linked++;
+    }
+  }
+
+  return linked;
+}
+
+// Conecta cada frame Universitario → HOME (click en logo TIM)
+function connectUniversitarioToHome(frames, homeFrame) {
+  if (!homeFrame) {
+    post({ type: "log", text: "  HOME no encontrado — saltando CIUDAD UNIV → HOME" });
+    return 0;
+  }
+  let count = 0;
+  const order = ["servicio", "paradas", "recorrido", "horarios"];
+  for (const key of order) {
+    const hs = frames[key + "_hs"];
+    if (hs.home && makeNav(hs.home, homeFrame.id)) count++;
+  }
+  post({ type: "log", text: "  CIUDAD UNIV → HOME (logos): " + count + " conexiones" });
+  return count;
+}
+
+// ─── MAIN BUILD ──────────────────────────────────────────────────────────────
+async function buildAll() {
+  const page = figma.root.children.find(p => p.name === PAGE_NAME);
+  if (!page) {
+    figma.ui.postMessage({ type: "error", text: "Página '" + PAGE_NAME + "' no encontrada. Ejecutá primero el plugin HOME y el de Larga Distancia." });
+    return;
+  }
+  figma.currentPage = page;
+
+  const homeFrame = page.findOne(n => n.name === HOME_NAME && n.type === "FRAME");
+  const ldFrame   = page.findOne(n => n.name === LD_NAME && n.type === "FRAME");
+
+  if (!ldFrame) {
+    figma.ui.postMessage({ type: "error", text: "Frame '" + LD_NAME + "' no encontrado. Ejecutá primero el plugin de Larga Distancia." });
+    return;
+  }
+
+  // Posicionar al lado de LARGA DISTANCIA — TIM
+  const baseX = ldFrame.x + ldFrame.width + 120;
+  const dx = FW + 120;
+  const xServicio  = baseX;
+  const xParadas   = baseX + dx;
+  const xRecorrido = baseX + dx * 2;
+  const xHorarios  = baseX + dx * 3;
+
+  post({ type: "log", text: "📐 Anclaje: LD termina en x=" + (ldFrame.x + ldFrame.width) });
+  post({ type: "log", text: "📐 Servicio en x=" + xServicio });
+
+  // ── Construir frames ─────────────────────────────────────────────────────
+  post({ type: "log", text: "🏗️ 1/4 — Construyendo Servicio (index)…" });
+  const s = await buildFrame(CU_SERVICIO,  xServicio,  "servicio",  _centralServicio,  true);
+  post({ type: "log", text: "🏗️ 2/4 — Construyendo Paradas…" });
+  const p = await buildFrame(CU_PARADAS,   xParadas,   "paradas",   _centralParadas,   false);
+  post({ type: "log", text: "🏗️ 3/4 — Construyendo Recorrido…" });
+  const r = await buildFrame(CU_RECORRIDO, xRecorrido, "recorrido", _centralRecorrido, false);
+  post({ type: "log", text: "🏗️ 4/4 — Construyendo Horarios…" });
+  const h = await buildFrame(CU_HORARIOS,  xHorarios,  "horarios",  _centralHorarios,  false);
+
+  // ── Conectar prototipo ───────────────────────────────────────────────────
+  post({ type: "log", text: "🔗 Conectando prototipo…" });
+  const frames = {
+    servicio: s.frame,
+    paradas: p.frame,
+    recorrido: r.frame,
+    horarios: h.frame,
+    servicio_hs: s.hotspots,
+    paradas_hs: p.hotspots,
+    recorrido_hs: r.hotspots,
+    horarios_hs: h.hotspots,
+  };
+  wireUniversitarioTabs(frames);
+  connectHomeToUniversitario(homeFrame, s.frame);
+  connectUniversitarioToHome(frames, homeFrame);
+
+  // ── Ajustar vista ────────────────────────────────────────────────────────
+  figma.viewport.scrollAndZoomIntoView([s.frame, p.frame, r.frame, h.frame]);
+  post({ type: "log", text: "✅ 4 frames generados y conectados" });
+  return { type: "done" };
+}
+
+// ─── MAIN ────────────────────────────────────────────────────────────────────
+figma.ui.onmessage = async (msg) => {
+  if (msg.type === "run") {
+    post({ type: "log", text: "🎓 Iniciando — CIUDAD UNIVERSITARIA — TIM" });
+    try {
+      const result = await buildAll();
+      figma.ui.postMessage(result || { type: "done" });
+      figma.notify("🎓 CIUDAD UNIVERSITARIA — TIM generada!", { timeout: 4000 });
+    } catch (e) {
+      figma.ui.postMessage({ type: "error", text: e.message || String(e) });
+    }
+  }
+  if (msg.type === "close") figma.closePlugin();
+};

@@ -1,0 +1,74 @@
+.container-tim { max-width: 1120px; margin-left: auto; margin-right: auto; padding-left: 2rem; padding-right: 2rem; }
+.btn-primary   { background: #722F37; color: #fff; border-radius: .5rem; font-weight: 700; padding: .75rem 2rem; transition: background .15s; display: inline-flex; align-items: center; }
+.btn-primary:hover { background: #5A2229; }
+.btn-outline   { border: 1.5px solid #722F37; color: #722F37; border-radius: .5rem; font-weight: 600; padding: .75rem 2rem; transition: background .15s; display: inline-flex; align-items: center; }
+.btn-outline:hover { background: #F5EAEB; }
+.btn-ghost-light { border: 1.5px solid rgba(255,255,255,.55); color: #fff; border-radius: .5rem; font-weight: 600; padding: .625rem 1.25rem; transition: border-color .15s; background: transparent; }
+.btn-ghost-light:hover { border-color: #fff; }
+.card { background: #fff; border: 1px solid #DDDDDD; border-radius: .75rem; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+.eyebrow { font-size: .6875rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: #722F37; margin-bottom: .75rem; }
+.section-title { font-size: 2rem; font-weight: 700; letter-spacing: -.02em; color: #333333; margin: 0 0 .75rem; }
+.section-sub   { font-size: .9375rem; color: #666666; line-height: 1.65; max-width: 600px; margin: 0; }
+.icon-pill     { background: #F5EAEB; color: #722F37; border-radius: .5rem; display: inline-flex; align-items: center; justify-content: center; }
+
+/* ── Panel de accesibilidad ──────────────────────────────────────────────── */
+.acc-panel.hidden { display: none; }
+
+.acc-toggle {
+  width: 44px; height: 26px; border-radius: 13px;
+  background: #DDDDDD; border: none; cursor: pointer;
+  position: relative; transition: background .2s; flex-shrink: 0;
+}
+.acc-toggle[aria-checked="true"] { background: #722F37; }
+.acc-toggle-thumb {
+  position: absolute; top: 3px; left: 3px;
+  width: 20px; height: 20px; border-radius: 50%;
+  background: #fff; transition: transform .2s;
+  display: block;
+}
+.acc-toggle[aria-checked="true"] .acc-toggle-thumb { transform: translateX(18px); }
+
+/* ── Modo alto contraste ─────────────────────────────────────────────────── */
+body.high-contrast,
+body.high-contrast header,
+body.high-contrast footer,
+body.high-contrast section,
+body.high-contrast main { background-color: #000 !important; color: #facc15 !important; border-color: #facc15 !important; }
+body.high-contrast .bg-tim          { background-color: #1a0a0c !important; }
+body.high-contrast .bg-white        { background-color: #111 !important; }
+body.high-contrast .bg-tim-bgalt    { background-color: #0a0a0a !important; }
+body.high-contrast .card            { background-color: #111 !important; border-color: #facc15 !important; }
+body.high-contrast .text-tim-text,
+body.high-contrast .text-tim-muted,
+body.high-contrast .text-tim-subtle { color: #facc15 !important; }
+body.high-contrast .text-tim        { color: #facc15 !important; }
+body.high-contrast a                { color: #facc15 !important; }
+body.high-contrast .bg-tim-light    { background-color: #222 !important; }
+body.high-contrast #acc-panel       { background-color: #111 !important; border-color: #facc15 !important; color: #facc15 !important; }
+
+/* ── Modo texto grande ───────────────────────────────────────────────────── */
+body.large-text { zoom: 1.2; }
+
+/* ── Hero slideshow ─────────────────────────────────────────────────────── */
+.hero-slide {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  filter: blur(1px);
+  transform: scale(1.03);
+  opacity: 0;
+  transition: opacity 1.2s ease-in-out;
+}
+.hero-slide.active { opacity: 1; }
+
+/* ── Foco visible ─────────────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid #722F37;
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+header :focus-visible,
+footer :focus-visible {
+  outline-color: #FFFFFF;
+}
+.high-contrast :focus-visible { outline-color: #facc15; }

@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>TIM · Terminal Inteligente de Mendoza</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        colors: {
+          tim: {
+            DEFAULT: '#722F37',
+            dark:    '#5A2229',
+            light:   '#F5EAEB',
+            text:    '#333333',
+            muted:   '#666666',
+            subtle:  '#888888',
+            border:  '#DDDDDD',
+            bgalt:   '#F7F7F7',
+          },
+        },
+        fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] },
+      },
+    },
+  };
+</script>
+
+<link rel="stylesheet" href="estilos/style.css" />
+</head>
+<body class="bg-white text-tim-text font-sans antialiased">
+
+<!-- ══ SPRITE DE ÍCONOS (invisible) ══════════════════════════════════════ -->
+<svg width="0" height="0" class="absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 22s7-6 7-12a7 7 0 10-14 0c0 6 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/>
+    </symbol>
+    <symbol id="i-cal" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 9h18M8 3v4M16 3v4"/>
+    </symbol>
+    <symbol id="i-bus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="4" y="5" width="16" height="12" rx="2"/><circle cx="8" cy="19" r="1.5"/><circle cx="16" cy="19" r="1.5"/><path d="M4 11h16M9 5v6"/>
+    </symbol>
+    <symbol id="i-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+      <circle cx="11" cy="11" r="7"/><path d="M21 21l-4-4"/>
+    </symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M5 12h14M13 6l6 6-6 6"/>
+    </symbol>
+  </defs>
+</svg>
+
+
+<!-- ══════════════════════════════════════════════
+     NAVBAR
+══════════════════════════════════════════════ -->
+<header class="bg-tim text-white sticky top-0 z-50 shadow-md">
+  <div class="container-tim flex items-center h-[76px] gap-10">
+    <a href="index.html" class="flex items-baseline gap-3 no-underline text-white shrink-0">
+      <span class="font-bold text-[28px] tracking-tight">TIM</span>
+      <span class="text-xs opacity-75 hidden sm:inline">Terminal Inteligente de Mendoza</span>
+    </a>
+    <nav class="flex gap-5 ml-6 text-sm font-semibold flex-1 overflow-x-auto">
+      <a href="https://mrosariopresedo.github.io/tim-larga-distancia/" class="whitespace-nowrap border-b-2 border-transparent pb-0.5 opacity-85 hover:opacity-100 transition-opacity">Larga Distancia</a>
+      <a href="https://luligavilanes.github.io/altamonta-a/"           class="whitespace-nowrap border-b-2 border-transparent pb-0.5 opacity-85 hover:opacity-100 transition-opacity">Alta Montaña</a>
+      <a href="https://valmartins222.github.io/Ruta-del-vino/"         class="whitespace-nowrap border-b-2 border-transparent pb-0.5 opacity-85 hover:opacity-100 transition-opacity">Ruta del Vino</a>
+      <a href="https://moraraimondo-cyber.github.io/Metrotranvia/"     class="whitespace-nowrap border-b-2 border-transparent pb-0.5 opacity-85 hover:opacity-100 transition-opacity">Aeropuerto</a>
+      <a href="https://martinasama2005.github.io/ciudaduniversitaria/" class="whitespace-nowrap border-b-2 border-transparent pb-0.5 opacity-85 hover:opacity-100 transition-opacity">Universitario</a>
+    </nav>
+    <div class="relative ml-auto shrink-0">
+      <button id="acc-btn" class="btn-ghost-light text-sm" aria-expanded="false" aria-controls="acc-panel">
+        Accesibilidad
+      </button>
+      <div id="acc-panel" role="dialog" aria-label="Opciones de accesibilidad" class="acc-panel hidden absolute right-0 top-[calc(100%+10px)] bg-white text-tim-text rounded-xl shadow-xl border border-tim-border p-5 w-64 z-50">
+        <p class="text-[11px] font-bold uppercase tracking-[.1em] text-tim-subtle mb-4">Opciones de accesibilidad</p>
+
+        <div class="flex items-center justify-between mb-4">
+          <div>
+            <div class="text-sm font-semibold">Alto contraste</div>
+            <div class="text-[12px] text-tim-muted">Fondo negro · texto amarillo</div>
+          </div>
+          <button id="toggle-contrast" role="switch" aria-checked="false" class="acc-toggle" aria-label="Activar alto contraste">
+            <span class="acc-toggle-thumb"></span>
+          </button>
+        </div>
+
+        <div class="flex items-center justify-between">
+          <div>
+            <div class="text-sm font-semibold">Texto grande</div>
+            <div class="text-[12px] text-tim-muted">Aumenta el tamaño de letra</div>
+          </div>
+          <button id="toggle-fontsize" role="switch" aria-checked="false" class="acc-toggle" aria-label="Activar texto grande">
+            <span class="acc-toggle-thumb"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+
+<!-- ══════════════════════════════════════════════
+     HERO
+══════════════════════════════════════════════ -->
+<section class="bg-tim text-white pt-20 pb-24 relative overflow-hidden">
+
+  <!-- Fotos de Mendoza difuminadas de fondo -->
+  <div aria-hidden="true">
+    <img class="hero-slide active" src="img/img-hero/nicolas-perez-eNWcXCbE5fI-unsplash.jpg"     alt="" />
+    <img class="hero-slide"        src="img/img-hero/rafael-hoyos-weht-yYEDDTDUSt0-unsplash.jpg" alt="" />
+    <img class="hero-slide"        src="img/img-hero/celso-costa-xrGNCxNkI-k-unsplash.jpg"       alt="" />
+    <img class="hero-slide"        src="img/img-hero/miris-navarro-QxBUqx2ndwQ-unsplash.jpg"     alt="" />
+  </div>
+  <!-- Overlay borgoña semitransparente -->
+  <div class="absolute inset-0 bg-tim/75" aria-hidden="true"></div>
+
+  <div class="container-tim relative z-10">
+
+    <p class="text-[13px] font-semibold tracking-[.12em] uppercase opacity-75 mb-5">Centro de Transporte · Mendoza</p>
+
+    <h1 class="text-[36px] sm:text-[64px] font-bold tracking-[-0.03em] leading-[.97] mb-8 max-w-[700px]">
+      Tu viaje<br>empieza aquí.
+    </h1>
+
+    <p class="text-xl leading-relaxed opacity-90 max-w-[580px] mb-12">
+      Horarios, destinos y servicios del Centro de Transporte de Mendoza en un solo lugar.
+    </p>
+
+    <!-- Buscador -->
+    <form id="search-form" class="bg-white text-tim-text rounded-xl p-2.5 flex flex-col sm:flex-row items-stretch gap-2 shadow-[0_20px_50px_rgba(0,0,0,.20)] max-w-[980px]">
+      <label class="flex-[2] flex items-center gap-3 px-4 py-2.5 min-w-0 cursor-pointer">
+        <span class="icon-pill w-7 h-7 shrink-0"><svg class="w-4 h-4"><use href="#i-pin"/></svg></span>
+        <span class="min-w-0">
+          <span class="block text-[11px] text-tim-muted uppercase tracking-[.1em] font-bold mb-0.5">¿A dónde vas?</span>
+          <input id="q-destino" class="block text-sm font-bold text-tim-text bg-transparent outline-none w-full placeholder:font-normal placeholder:text-tim-muted" placeholder="Buenos Aires, Las Leñas, Aeropuerto…" />
+        </span>
+      </label>
+      <span class="hidden sm:block w-px bg-tim-border self-stretch my-1"></span>
+      <label class="flex-1 flex items-center gap-3 px-4 py-2.5 min-w-0 cursor-pointer">
+        <span class="icon-pill w-7 h-7 shrink-0"><svg class="w-4 h-4"><use href="#i-cal"/></svg></span>
+        <span class="min-w-0">
+          <span class="block text-[11px] text-tim-muted uppercase tracking-[.1em] font-bold mb-0.5">Fecha</span>
+          <input id="q-fecha" type="date" class="block text-sm font-bold text-tim-text bg-transparent outline-none w-full" />
+        </span>
+      </label>
+      <span class="hidden sm:block w-px bg-tim-border self-stretch my-1"></span>
+      <label class="flex-[1.2] flex items-center gap-3 px-4 py-2.5 min-w-0 cursor-pointer">
+        <span class="icon-pill w-7 h-7 shrink-0"><svg class="w-4 h-4"><use href="#i-bus"/></svg></span>
+        <span class="min-w-0">
+          <span class="block text-[11px] text-tim-muted uppercase tracking-[.1em] font-bold mb-0.5">Servicio</span>
+          <select id="q-servicio" class="block text-sm font-bold text-tim-text bg-transparent outline-none w-full cursor-pointer">
+            <option>Todos</option>
+            <option>Larga Distancia</option>
+            <option>Alta Montaña</option>
+            <option>Ruta del Vino</option>
+            <option>Aeropuerto</option>
+            <option>Universitario</option>
+          </select>
+        </span>
+      </label>
+      <button type="submit" class="btn-primary gap-2 text-sm px-7 justify-center sm:w-auto w-full">
+        <svg class="w-[17px] h-[17px]"><use href="#i-search"/></svg>
+        Buscar
+      </button>
+    </form>
+
+    <!-- Stats -->
+    <div class="flex gap-12 mt-12 flex-wrap">
+      <div class="flex items-baseline gap-3">
+        <span class="text-[32px] font-bold tracking-tight">5</span>
+        <span class="text-[14px] opacity-85">destinos principales</span>
+      </div>
+      <div class="flex items-baseline gap-3">
+        <span class="text-[32px] font-bold tracking-tight">+200</span>
+        <span class="text-[14px] opacity-85">salidas diarias</span>
+      </div>
+      <div class="flex items-baseline gap-3">
+        <span class="text-[32px] font-bold tracking-tight">100%</span>
+        <span class="text-[14px] opacity-85">accesible para todos</span>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     SERVICIOS
+══════════════════════════════════════════════ -->
+<section id="servicios" class="bg-white py-24">
+  <div class="container-tim">
+
+    <div class="mb-12">
+      <div class="eyebrow">Servicios</div>
+      <h2 class="section-title">Nuestros Servicios</h2>
+      <p class="section-sub">Cinco líneas que conectan Mendoza con el país, la cordillera y la vida universitaria.</p>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5">
+
+      <a href="https://mrosariopresedo.github.io/tim-larga-distancia/" class="card p-6 flex flex-col gap-3 hover:shadow-[0_8px_32px_rgba(114,47,55,.12)] hover:border-tim/30 transition-all group no-underline text-inherit">
+        <span class="icon-pill w-14 h-14 rounded-2xl shrink-0">
+          <img src="iconos/iconos-servicios-tim/larga-distancia.svg" alt="" class="w-7 h-7" />
+        </span>
+        <div>
+          <div class="text-[17px] font-bold tracking-tight text-tim-text mb-1.5">Larga Distancia</div>
+          <div class="text-[13px] text-tim-muted leading-relaxed">Buenos Aires, Córdoba, Rosario y todo el país.</div>
+        </div>
+        <span class="text-sm font-semibold text-tim mt-auto flex items-center gap-1.5 group-hover:gap-2.5 transition-all">Ver horarios <svg class="w-4 h-4"><use href="#i-arrow"/></svg></span>
+      </a>
+
+      <a href="https://luligavilanes.github.io/altamonta-a/" class="card p-6 flex flex-col gap-3 hover:shadow-[0_8px_32px_rgba(114,47,55,.12)] hover:border-tim/30 transition-all group no-underline text-inherit">
+        <span class="icon-pill w-14 h-14 rounded-2xl shrink-0">
+          <img src="iconos/iconos-servicios-tim/alta-montana.svg" alt="" class="w-7 h-7" />
+        </span>
+        <div>
+          <div class="text-[17px] font-bold tracking-tight text-tim-text mb-1.5">Alta Montaña</div>
+          <div class="text-[13px] text-tim-muted leading-relaxed">Uspallata, Penitentes, Las Leñas y la cordillera.</div>
+        </div>
+        <span class="text-sm font-semibold text-tim mt-auto flex items-center gap-1.5 group-hover:gap-2.5 transition-all">Ver horarios <svg class="w-4 h-4"><use href="#i-arrow"/></svg></span>
+      </a>
+
+      <a href="https://valmartins222.github.io/Ruta-del-vino/" class="card p-6 flex flex-col gap-3 hover:shadow-[0_8px_32px_rgba(114,47,55,.12)] hover:border-tim/30 transition-all group no-underline text-inherit">
+        <span class="icon-pill w-14 h-14 rounded-2xl shrink-0">
+          <img src="iconos/iconos-servicios-tim/ruta-del-vino.svg" alt="" class="w-7 h-7" />
+        </span>
+        <div>
+          <div class="text-[17px] font-bold tracking-tight text-tim-text mb-1.5">Ruta del Vino</div>
+          <div class="text-[13px] text-tim-muted leading-relaxed">Bodegas de Maipú, Luján de Cuyo y Valle de Uco.</div>
+        </div>
+        <span class="text-sm font-semibold text-tim mt-auto flex items-center gap-1.5 group-hover:gap-2.5 transition-all">Ver horarios <svg class="w-4 h-4"><use href="#i-arrow"/></svg></span>
+      </a>
+
+      <a href="https://moraraimondo-cyber.github.io/Metrotranvia/" class="card p-6 flex flex-col gap-3 hover:shadow-[0_8px_32px_rgba(114,47,55,.12)] hover:border-tim/30 transition-all group no-underline text-inherit">
+        <span class="icon-pill w-14 h-14 rounded-2xl shrink-0">
+          <img src="iconos/iconos-servicios-tim/aeropuerto.svg" alt="" class="w-7 h-7" />
+        </span>
+        <div>
+          <div class="text-[17px] font-bold tracking-tight text-tim-text mb-1.5">Aeropuerto</div>
+          <div class="text-[13px] text-tim-muted leading-relaxed">Conexión directa al Aeropuerto El Plumerillo.</div>
+        </div>
+        <span class="text-sm font-semibold text-tim mt-auto flex items-center gap-1.5 group-hover:gap-2.5 transition-all">Ver horarios <svg class="w-4 h-4"><use href="#i-arrow"/></svg></span>
+      </a>
+
+      <a href="https://martinasama2005.github.io/ciudaduniversitaria/" class="card p-6 flex flex-col gap-3 hover:shadow-[0_8px_32px_rgba(114,47,55,.12)] hover:border-tim/30 transition-all group no-underline text-inherit">
+        <span class="icon-pill w-14 h-14 rounded-2xl shrink-0">
+          <img src="iconos/iconos-servicios-tim/universitario.svg" alt="" class="w-7 h-7" />
+        </span>
+        <div>
+          <div class="text-[17px] font-bold tracking-tight text-tim-text mb-1.5">Universitario</div>
+          <div class="text-[13px] text-tim-muted leading-relaxed">UNCuyo, UTN y campus del Gran Mendoza.</div>
+        </div>
+        <span class="text-sm font-semibold text-tim mt-auto flex items-center gap-1.5 group-hover:gap-2.5 transition-all">Ver horarios <svg class="w-4 h-4"><use href="#i-arrow"/></svg></span>
+      </a>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     CÓMO USAR TIM
+══════════════════════════════════════════════ -->
+<section class="bg-tim-bgalt py-24">
+  <div class="container-tim">
+
+    <div class="mb-16 text-center">
+      <div class="eyebrow">Cómo funciona</div>
+      <h2 class="section-title mx-auto">Cómo usar TIM</h2>
+      <p class="section-sub mx-auto text-center">Tres pasos para que tu viaje arranque sin vueltas.</p>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+
+      <div class="text-center flex flex-col items-center gap-4">
+        <div class="w-[72px] h-[72px] rounded-full bg-tim-light flex items-center justify-center">
+          <img src="iconos/iconos-como-usar-tim/paso-1-destino.svg" alt="" class="w-10 h-10" />
+        </div>
+        <div>
+          <div class="text-[11px] font-bold tracking-[.1em] uppercase text-tim mb-2">PASO 01</div>
+          <div class="text-[22px] font-semibold text-tim-text mb-2">Elegí tu destino</div>
+          <p class="text-[14px] text-tim-muted leading-relaxed max-w-[280px] mx-auto">Buscá entre 5 líneas de servicio y más de 50 paradas.</p>
+        </div>
+      </div>
+
+      <div class="text-center flex flex-col items-center gap-4">
+        <div class="w-[72px] h-[72px] rounded-full bg-tim-light flex items-center justify-center">
+          <img src="iconos/iconos-como-usar-tim/paso-2-horarios.svg" alt="" class="w-10 h-10" />
+        </div>
+        <div>
+          <div class="text-[11px] font-bold tracking-[.1em] uppercase text-tim mb-2">PASO 02</div>
+          <div class="text-[22px] font-semibold text-tim-text mb-2">Consultá los horarios</div>
+          <p class="text-[14px] text-tim-muted leading-relaxed max-w-[280px] mx-auto">Salidas en tiempo real y frecuencias por día.</p>
+        </div>
+      </div>
+
+      <div class="text-center flex flex-col items-center gap-4">
+        <div class="w-[72px] h-[72px] rounded-full bg-tim-light flex items-center justify-center">
+          <img src="iconos/iconos-como-usar-tim/paso-3-planificar.svg" alt="" class="w-10 h-10" />
+        </div>
+        <div>
+          <div class="text-[11px] font-bold tracking-[.1em] uppercase text-tim mb-2">PASO 03</div>
+          <div class="text-[22px] font-semibold text-tim-text mb-2">Planificá tu viaje</div>
+          <p class="text-[14px] text-tim-muted leading-relaxed max-w-[280px] mx-auto">Guardá tu ruta y recibí alertas de servicio.</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     DESTACADOS
+══════════════════════════════════════════════ -->
+<section class="bg-white py-24">
+  <div class="container-tim">
+
+    <div class="flex items-end justify-between gap-8 mb-12">
+      <div>
+        <div class="eyebrow">Novedades</div>
+        <h2 class="section-title">Destacados</h2>
+        <p class="section-sub">Avisos, cambios de servicio y novedades de la terminal.</p>
+      </div>
+      <a href="#" class="text-sm font-semibold text-tim whitespace-nowrap hover:text-tim-dark">Ver todas las novedades →</a>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+      <article class="card flex flex-col overflow-hidden">
+        <div class="h-44 overflow-hidden">
+          <img src="img/img-destacadas-tim/servicio-nocturno-a-buenos-aires.jpg" alt="Servicio nocturno a Buenos Aires" class="w-full h-full object-cover" />
+        </div>
+        <div class="p-6 flex flex-col gap-3 flex-1">
+          <div class="flex items-center gap-3">
+            <span class="bg-tim-light text-tim text-[11px] font-bold px-2.5 py-1 rounded">Nuevo servicio</span>
+            <span class="text-[12px] text-tim-muted">15 may 2026</span>
+          </div>
+          <div class="text-[18px] font-semibold text-tim-text leading-snug">Servicio nocturno a Buenos Aires</div>
+          <p class="text-[13px] text-tim-muted leading-relaxed flex-1">Desde el 1° de junio, dos salidas nocturnas semanales con coche-cama y desayuno incluido.</p>
+          <a href="#" class="text-sm font-semibold text-tim hover:text-tim-dark mt-2">Leer más →</a>
+        </div>
+      </article>
+
+      <article class="card flex flex-col overflow-hidden">
+        <div class="h-44 overflow-hidden">
+          <img src="img/img-destacadas-tim/cambio-frecuencias-alta-montaña.jpg" alt="Cambio en frecuencias Alta Montaña" class="w-full h-full object-cover" />
+        </div>
+        <div class="p-6 flex flex-col gap-3 flex-1">
+          <div class="flex items-center gap-3">
+            <span class="bg-tim-light text-tim text-[11px] font-bold px-2.5 py-1 rounded">Aviso</span>
+            <span class="text-[12px] text-tim-muted">12 may 2026</span>
+          </div>
+          <div class="text-[18px] font-semibold text-tim-text leading-snug">Cambio en frecuencias Alta Montaña</div>
+          <p class="text-[13px] text-tim-muted leading-relaxed flex-1">Por obras en la Ruta 7, las salidas hacia Uspallata se reprograman de lunes a viernes.</p>
+          <a href="https://luligavilanes.github.io/altamonta-a/" class="text-sm font-semibold text-tim hover:text-tim-dark mt-2">Ver horarios actualizados →</a>
+        </div>
+      </article>
+
+      <article class="card flex flex-col overflow-hidden">
+        <div class="h-44 overflow-hidden">
+          <img src="img/img-destacadas-tim/wifi-gratuito-en-plataformas.jpg" alt="Wi-Fi gratuito en todas las plataformas" class="w-full h-full object-cover" />
+        </div>
+        <div class="p-6 flex flex-col gap-3 flex-1">
+          <div class="flex items-center gap-3">
+            <span class="bg-tim-light text-tim text-[11px] font-bold px-2.5 py-1 rounded">Novedad</span>
+            <span class="text-[12px] text-tim-muted">08 may 2026</span>
+          </div>
+          <div class="text-[18px] font-semibold text-tim-text leading-snug">Wi-Fi gratuito en todas las plataformas</div>
+          <p class="text-[13px] text-tim-muted leading-relaxed flex-1">Conectate al instante con la red TIM-Libre desde cualquier sector de la terminal.</p>
+          <a href="#" class="text-sm font-semibold text-tim hover:text-tim-dark mt-2">Leer más →</a>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════════ -->
+<footer class="bg-tim-text text-white pt-16 pb-8">
+  <div class="container-tim">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr] gap-12 pb-12 border-b border-white/10">
+
+      <div>
+        <div class="text-[32px] font-bold tracking-tight">TIM</div>
+        <div class="text-[13px] opacity-70 mt-1.5">Terminal Inteligente de Mendoza</div>
+        <address class="text-sm not-italic opacity-85 mt-5 leading-relaxed max-w-[280px]">
+          Juan B. Alberdi s/n, M5519<br>
+          Guaymallén, Mendoza, Argentina<br>
+          <span class="opacity-60">Atención 24/7 · 0261 476-5875</span>
+        </address>
+      </div>
+
+      <div>
+        <div class="text-[13px] font-bold tracking-[.08em] uppercase mb-4">Navegación</div>
+        <ul class="flex flex-col gap-2.5 text-sm opacity-80">
+          <li><a href="index.html" class="hover:opacity-100 transition-opacity">Inicio</a></li>
+          <li><a href="#servicios" class="hover:opacity-100 transition-opacity">Servicios</a></li>
+          <li><a href="#"          class="hover:opacity-100 transition-opacity">Accesibilidad</a></li>
+          <li><a href="#"          class="hover:opacity-100 transition-opacity">Contacto</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="text-[13px] font-bold tracking-[.08em] uppercase mb-4">Líneas</div>
+        <ul class="flex flex-col gap-2.5 text-sm opacity-80">
+          <li><a href="https://mrosariopresedo.github.io/tim-larga-distancia/" class="hover:opacity-100 transition-opacity">Larga Distancia</a></li>
+          <li><a href="https://luligavilanes.github.io/altamonta-a/"           class="hover:opacity-100 transition-opacity">Alta Montaña</a></li>
+          <li><a href="https://valmartins222.github.io/Ruta-del-vino/"         class="hover:opacity-100 transition-opacity">Ruta del Vino</a></li>
+          <li><a href="https://moraraimondo-cyber.github.io/Metrotranvia/"     class="hover:opacity-100 transition-opacity">Aeropuerto</a></li>
+          <li><a href="https://martinasama2005.github.io/ciudaduniversitaria/" class="hover:opacity-100 transition-opacity">Universitario</a></li>
+        </ul>
+      </div>
+
+      <div>
+        <div class="text-[13px] font-bold tracking-[.08em] uppercase mb-4">Información</div>
+        <ul class="flex flex-col gap-2.5 text-sm opacity-80">
+          <li><a href="#" class="hover:opacity-100 transition-opacity">Cómo llegar</a></li>
+          <li><a href="#" class="hover:opacity-100 transition-opacity">Tarifas</a></li>
+          <li><a href="#" class="hover:opacity-100 transition-opacity">Política de privacidad</a></li>
+          <li><a href="#" class="hover:opacity-100 transition-opacity">Términos</a></li>
+        </ul>
+      </div>
+
+    </div>
+    <div class="flex justify-between items-center mt-6 text-[13px] opacity-65 flex-wrap gap-3">
+      <div>© 2026 Nexo Studio · Terminal Inteligente de Mendoza</div>
+      <div>Hecho en Mendoza, Argentina</div>
+    </div>
+  </div>
+</footer>
+
+
+<script src="js/main.js" defer></script>
+
+</body>
+</html>
