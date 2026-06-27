@@ -4,6 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>TIM · Terminal Inteligente de Mendoza</title>
+<meta name="description" content="Centro de Transporte de Mendoza: horarios, destinos y servicios de las 5 líneas (Larga Distancia, Alta Montaña, Ruta del Vino, Aeropuerto y Universitario) en un solo lugar." />
 
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -21,7 +22,7 @@
             light:   '#F5EAEB',
             text:    '#333333',
             muted:   '#666666',
-            subtle:  '#888888',
+            subtle:  '#707070',
             border:  '#DDDDDD',
             bgalt:   '#F7F7F7',
           },
@@ -104,6 +105,8 @@
     </div>
   </div>
 </header>
+
+<main>
 
 
 <!-- ══════════════════════════════════════════════
@@ -332,7 +335,7 @@
         <h2 class="section-title">Destacados</h2>
         <p class="section-sub">Avisos, cambios de servicio y novedades de la terminal.</p>
       </div>
-      <a href="#" class="text-sm font-semibold text-tim whitespace-nowrap hover:text-tim-dark">Ver todas las novedades →</a>
+      <a href="#servicios" class="text-sm font-semibold text-tim whitespace-nowrap hover:text-tim-dark">Ver todas las novedades →</a>
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -348,7 +351,7 @@
           </div>
           <div class="text-[18px] font-semibold text-tim-text leading-snug">Servicio nocturno a Buenos Aires</div>
           <p class="text-[13px] text-tim-muted leading-relaxed flex-1">Desde el 1° de junio, dos salidas nocturnas semanales con coche-cama y desayuno incluido.</p>
-          <a href="#" class="text-sm font-semibold text-tim hover:text-tim-dark mt-2">Leer más →</a>
+          <a href="#servicios" class="text-sm font-semibold text-tim hover:text-tim-dark mt-2">Leer más →</a>
         </div>
       </article>
 
@@ -378,13 +381,15 @@
           </div>
           <div class="text-[18px] font-semibold text-tim-text leading-snug">Wi-Fi gratuito en todas las plataformas</div>
           <p class="text-[13px] text-tim-muted leading-relaxed flex-1">Conectate al instante con la red TIM-Libre desde cualquier sector de la terminal.</p>
-          <a href="#" class="text-sm font-semibold text-tim hover:text-tim-dark mt-2">Leer más →</a>
+          <a href="#servicios" class="text-sm font-semibold text-tim hover:text-tim-dark mt-2">Leer más →</a>
         </div>
       </article>
 
     </div>
   </div>
 </section>
+
+</main>
 
 
 <!-- ══════════════════════════════════════════════
@@ -409,8 +414,8 @@
         <ul class="flex flex-col gap-2.5 text-sm opacity-80">
           <li><a href="index.html" class="hover:opacity-100 transition-opacity">Inicio</a></li>
           <li><a href="#servicios" class="hover:opacity-100 transition-opacity">Servicios</a></li>
-          <li><a href="#"          class="hover:opacity-100 transition-opacity">Accesibilidad</a></li>
-          <li><a href="#"          class="hover:opacity-100 transition-opacity">Contacto</a></li>
+          <li><a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});document.getElementById('acc-btn').click();return false;" class="hover:opacity-100 transition-opacity">Accesibilidad</a></li>
+          <li><a href="tel:+542614765875"          class="hover:opacity-100 transition-opacity">Contacto</a></li>
         </ul>
       </div>
 
@@ -428,10 +433,10 @@
       <div>
         <div class="text-[13px] font-bold tracking-[.08em] uppercase mb-4">Información</div>
         <ul class="flex flex-col gap-2.5 text-sm opacity-80">
-          <li><a href="#" class="hover:opacity-100 transition-opacity">Cómo llegar</a></li>
-          <li><a href="#" class="hover:opacity-100 transition-opacity">Tarifas</a></li>
-          <li><a href="#" class="hover:opacity-100 transition-opacity">Política de privacidad</a></li>
-          <li><a href="#" class="hover:opacity-100 transition-opacity">Términos</a></li>
+          <li><a href="https://www.google.com/maps/search/?api=1&query=Terminal+de+Omnibus+de+Mendoza" class="hover:opacity-100 transition-opacity">Cómo llegar</a></li>
+          <li><a href="#servicios" class="hover:opacity-100 transition-opacity">Tarifas</a></li>
+          <li><a href="https://mrosariopresedo.github.io/nexo-studio-tim/" class="hover:opacity-100 transition-opacity">Política de privacidad</a></li>
+          <li><a href="https://mrosariopresedo.github.io/nexo-studio-tim/" class="hover:opacity-100 transition-opacity">Términos</a></li>
         </ul>
       </div>
 
