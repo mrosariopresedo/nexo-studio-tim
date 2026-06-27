@@ -132,6 +132,9 @@ function precargarDesdeURL() {
 
 document.addEventListener('DOMContentLoaded', () => {
   cargarDestinos();
+  // La fecha no puede ser anterior a hoy
+  const cvFecha = document.getElementById('cv-fecha');
+  if (cvFecha) cvFecha.min = new Date().toISOString().split('T')[0];
   document.getElementById('cv-form').addEventListener('submit', consultarViaje);
   document.querySelectorAll('.cv-chip').forEach(chip => {
     chip.addEventListener('click', () => consultaRapida(chip.dataset.destino));
