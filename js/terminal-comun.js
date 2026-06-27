@@ -73,6 +73,11 @@ document.querySelectorAll('[data-dropdown]').forEach(function (boton) {
   });
 });
 
+// Al elegir una opción del menú, cerrarlo
+document.querySelectorAll('.dropdown-menu a').forEach(function (a) {
+  a.addEventListener('click', cerrarDesplegables);
+});
+
 // Cerrar los desplegables al hacer click fuera o con la tecla Escape
 document.addEventListener('click', function (e) {
   if (!e.target.closest('.nav-dd')) cerrarDesplegables();

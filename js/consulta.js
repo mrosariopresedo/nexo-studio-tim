@@ -95,7 +95,7 @@ function consultarViaje(evento) {
 
         <div class="flex items-center justify-between gap-4 flex-wrap pt-5 border-t border-tim-border">
           <p class="text-[12px] text-tim-subtle max-w-[420px]">Las plataformas se confirman en los monitores 15 a 20 minutos antes de la salida. Datos de referencia, sujetos a disponibilidad de la empresa operadora.</p>
-          <a href="${dato.sitio}" class="btn-primary text-sm gap-2">Ver horarios completos
+          <a href="${dato.sitio}" target="_blank" rel="noopener noreferrer" class="btn-primary text-sm gap-2">Ver horarios completos
             <svg class="w-4 h-4"><use href="#i-arrow"/></svg>
           </a>
         </div>

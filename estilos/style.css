@@ -47,6 +47,22 @@ body.high-contrast :focus-visible { outline-color: #facc15 !important; }
 /* ── Modo texto grande ───────────────────────────────────────────────────── */
 body.large-text { zoom: 1.2; }
 
+/* ── Scroll suave para las anclas del one-page ───────────────────────────── */
+html { scroll-behavior: smooth; }
+/* Compensa el navbar fijo al saltar a una sección */
+section[id] { scroll-margin-top: 90px; }
+
+/* ── Plano de la terminal: sectores clickeables y navegables por teclado ─── */
+.zona { cursor: pointer; }
+.zona rect { fill: #F5EAEB; stroke: #DDDDDD; stroke-width: 1.5; transition: fill .15s; }
+.zona text { fill: #333333; font-weight: 600; font-family: 'Inter', sans-serif; }
+.zona:hover rect, .zona:focus-visible rect { fill: #722F37; }
+.zona:hover text, .zona:focus-visible text { fill: #FFFFFF; }
+.zona:focus-visible { outline: none; }
+.zona:focus-visible rect { stroke: #5A2229; stroke-width: 3; }
+.zona-activa rect { fill: #722F37; stroke: #5A2229; }
+.zona-activa text { fill: #FFFFFF; }
+
 /* ── Hero slideshow ─────────────────────────────────────────────────────── */
 .hero-slide {
   position: absolute; inset: 0;
