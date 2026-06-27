@@ -1,83 +1,32 @@
-// ── Accesibilidad ─────────────────────────────────────────────────────────
-const accBtn      = document.getElementById('acc-btn');
-const accPanel    = document.getElementById('acc-panel');
-const btnContrast = document.getElementById('toggle-contrast');
-const btnFont     = document.getElementById('toggle-fontsize');
+// ════════════════════════════════════════════════════════════════════════════
+//  TIM · JS de la home — slideshow del hero y buscador
+//  La accesibilidad, los menús del navbar y los enlaces externos los maneja
+//  js/terminal-comun.js (cargado en todas las páginas).
+//  Nexo Studio · UADE Desarrollo Web 2026
+// ════════════════════════════════════════════════════════════════════════════
 
-// Abrir / cerrar panel
-accBtn.addEventListener('click', function(e) {
-  e.stopPropagation();
-  const open = !accPanel.classList.contains('hidden');
-  accPanel.classList.toggle('hidden', open);
-  accBtn.setAttribute('aria-expanded', String(!open));
-});
-
-// Cerrar al hacer click fuera
-document.addEventListener('click', function(e) {
-  if (!accPanel.contains(e.target) && e.target !== accBtn) {
-    accPanel.classList.add('hidden');
-    accBtn.setAttribute('aria-expanded', 'false');
-  }
-});
-
-function setToggle(btn, active) {
-  btn.setAttribute('aria-checked', String(active));
-}
-
-// Alto contraste
-btnContrast.addEventListener('click', function() {
-  const active = document.body.classList.toggle('high-contrast');
-  setToggle(btnContrast, active);
-  localStorage.setItem('tim-contrast', active);
-});
-
-// Texto grande
-btnFont.addEventListener('click', function() {
-  const active = document.body.classList.toggle('large-text');
-  setToggle(btnFont, active);
-  localStorage.setItem('tim-fontsize', active);
-});
-
-// Restaurar preferencias guardadas
-if (localStorage.getItem('tim-contrast') === 'true') {
-  document.body.classList.add('high-contrast');
-  setToggle(btnContrast, true);
-}
-if (localStorage.getItem('tim-fontsize') === 'true') {
-  document.body.classList.add('large-text');
-  setToggle(btnFont, true);
-}
-
-// ── Slideshow del hero ────────────────────────────────────────────────────
+// ── Slideshow del hero (fotos de Mendoza de fondo) ─────────────────────────
 const slides = document.querySelectorAll('.hero-slide');
 let current = 0;
+if (slides.length > 1) {
+  setInterval(function () {
+    slides[current].classList.remove('active');
+    current = (current + 1) % slides.length;
+    slides[current].classList.add('active');
+  }, 6000);
+}
 
-setInterval(function() {
-  slides[current].classList.remove('active');
-  current = (current + 1) % slides.length;
-  slides[current].classList.add('active');
-}, 6000);
-
-// ── Buscador ──────────────────────────────────────────────────────────────
-document.getElementById('search-form').addEventListener('submit', function(e) {
-  e.preventDefault();
-  const servicio = document.getElementById('q-servicio').value;
-  const destinos = {
-    'Larga Distancia': 'https://mrosariopresedo.github.io/tim-larga-distancia/',
-    'Alta Montaña':    'https://luligavilanes.github.io/altamonta-a/',
-    'Ruta del Vino':   'https://valmartins222.github.io/Ruta-del-vino/',
-    'Aeropuerto':      'https://moraraimondo-cyber.github.io/Metrotranvia/',
-    'Universitario':   'https://martinasama2005.github.io/ciudaduniversitaria/',
-  };
-  if (destinos[servicio]) {
-    window.open(destinos[servicio], '_blank');
-  } else {
-    document.getElementById('servicios').scrollIntoView({ behavior: 'smooth' });
-  }
-});
-
-// ── Abrir los enlaces a otros sitios en una pestaña nueva ──────────────────
-document.querySelectorAll('a[href^="http"]').forEach(function(a) {
-  a.target = '_blank';
-  a.rel    = 'noopener noreferrer';
-});
+// ── Buscador del hero → lleva a la Consulta de viajes con el destino ────────
+const formBuscar = document.getElementById('search-form');
+if (formBuscar) {
+  formBuscar.addEventListener('submit', function (e) {
+    e.preventDefault();
+    const destino = document.getElementById('q-destino').value.trim();
+    const fecha   = document.getElementById('q-fecha').value;
+    const params  = new URLSearchParams();
+    if (destino) params.set('destino', destino);
+    if (fecha)   params.set('fecha', fecha);
+    const qs = params.toString();
+    window.location.href = 'consulta-viajes.html' + (qs ? '?' + qs : '');
+  });
+}

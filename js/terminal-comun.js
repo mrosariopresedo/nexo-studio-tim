@@ -54,6 +54,33 @@ if (accBtn && accPanel) {
   }
 }
 
+// ─── Menús desplegables del navbar (Líneas · La terminal) ──────────────────
+function cerrarDesplegables() {
+  document.querySelectorAll('.dropdown-menu').forEach(m => m.classList.add('hidden'));
+  document.querySelectorAll('[data-dropdown]').forEach(b => b.setAttribute('aria-expanded', 'false'));
+}
+
+document.querySelectorAll('[data-dropdown]').forEach(function (boton) {
+  const menu = document.getElementById(boton.getAttribute('data-dropdown'));
+  boton.addEventListener('click', function (e) {
+    e.stopPropagation();
+    const abierto = !menu.classList.contains('hidden');
+    cerrarDesplegables();           // cerrar cualquier otro menú abierto
+    if (!abierto) {
+      menu.classList.remove('hidden');
+      boton.setAttribute('aria-expanded', 'true');
+    }
+  });
+});
+
+// Cerrar los desplegables al hacer click fuera o con la tecla Escape
+document.addEventListener('click', function (e) {
+  if (!e.target.closest('.nav-dd')) cerrarDesplegables();
+});
+document.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') cerrarDesplegables();
+});
+
 // ─── Abrir los enlaces a otros sitios en una pestaña nueva ──────────────────
 document.querySelectorAll('a[href^="http"]').forEach(function (a) {
   a.target = '_blank';

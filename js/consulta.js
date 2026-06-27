@@ -112,10 +112,29 @@ function consultaRapida(destino) {
   document.getElementById('cv-form').requestSubmit();
 }
 
+// ─── Precargar el destino y la fecha que llegan del buscador de la home ─────
+function precargarDesdeURL() {
+  const params  = new URLSearchParams(location.search);
+  const buscado = params.get('destino');
+  const fecha   = params.get('fecha');
+  if (fecha) document.getElementById('cv-fecha').value = fecha;
+  if (!buscado) return;
+
+  const limpiar = s => s.toLowerCase().normalize('NFD').replace(/[̀-ͯ]/g, '');
+  const t = limpiar(buscado);
+  // Busca el destino cuyo nombre contenga lo que escribió la persona
+  const dato = DESTINOS.find(d => limpiar(d.destino).includes(t));
+  if (dato) {
+    document.getElementById('cv-destino').value = dato.destino;
+    document.getElementById('cv-form').requestSubmit();
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   cargarDestinos();
   document.getElementById('cv-form').addEventListener('submit', consultarViaje);
   document.querySelectorAll('.cv-chip').forEach(chip => {
     chip.addEventListener('click', () => consultaRapida(chip.dataset.destino));
   });
+  precargarDesdeURL();
 });
