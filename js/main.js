@@ -70,8 +70,14 @@ document.getElementById('search-form').addEventListener('submit', function(e) {
     'Universitario':   'https://martinasama2005.github.io/ciudaduniversitaria/',
   };
   if (destinos[servicio]) {
-    window.location.href = destinos[servicio];
+    window.open(destinos[servicio], '_blank');
   } else {
     document.getElementById('servicios').scrollIntoView({ behavior: 'smooth' });
   }
+});
+
+// ── Abrir los enlaces a otros sitios en una pestaña nueva ──────────────────
+document.querySelectorAll('a[href^="http"]').forEach(function(a) {
+  a.target = '_blank';
+  a.rel    = 'noopener noreferrer';
 });

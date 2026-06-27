@@ -29,22 +29,20 @@
 .acc-toggle[aria-checked="true"] .acc-toggle-thumb { transform: translateX(18px); }
 
 /* ── Modo alto contraste ─────────────────────────────────────────────────── */
-body.high-contrast,
-body.high-contrast header,
-body.high-contrast footer,
-body.high-contrast section,
-body.high-contrast main { background-color: #000 !important; color: #facc15 !important; border-color: #facc15 !important; }
-body.high-contrast .bg-tim          { background-color: #1a0a0c !important; }
-body.high-contrast .bg-white        { background-color: #111 !important; }
-body.high-contrast .bg-tim-bgalt    { background-color: #0a0a0a !important; }
-body.high-contrast .card            { background-color: #111 !important; border-color: #facc15 !important; }
-body.high-contrast .text-tim-text,
-body.high-contrast .text-tim-muted,
-body.high-contrast .text-tim-subtle { color: #facc15 !important; }
-body.high-contrast .text-tim        { color: #facc15 !important; }
-body.high-contrast a                { color: #facc15 !important; }
-body.high-contrast .bg-tim-light    { background-color: #222 !important; }
-body.high-contrast #acc-panel       { background-color: #111 !important; border-color: #facc15 !important; color: #facc15 !important; }
+/* Fondo negro y TODO el texto y los bordes en amarillo (regla WCAG AA de
+   contraste). Se ocultan las fotos decorativas del hero para que el texto
+   quede siempre sobre negro. */
+body.high-contrast { background-color: #000 !important; }
+body.high-contrast * {
+  background-color: transparent !important;
+  background-image: none !important;
+  color: #facc15 !important;
+  border-color: #facc15 !important;
+}
+body.high-contrast .hero-slide { display: none !important; }
+body.high-contrast a { text-decoration: underline !important; }
+body.high-contrast img { opacity: 0.9; }
+body.high-contrast :focus-visible { outline-color: #facc15 !important; }
 
 /* ── Modo texto grande ───────────────────────────────────────────────────── */
 body.large-text { zoom: 1.2; }
