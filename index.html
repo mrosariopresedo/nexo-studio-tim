@@ -168,8 +168,8 @@
         <svg class="w-[18px] h-[18px]"><use href="#i-search"/></svg>
         Consultá tu viaje
       </a>
-      <a href="#servicios-terminal" class="btn-ghost-light text-base px-6 no-underline">Servicios</a>
-      <a href="#plano" class="btn-ghost-light text-base px-6 no-underline">Plano</a>
+      <a href="#servicios-terminal" class="inline-flex items-center justify-center border-[1.5px] border-white/55 hover:border-white text-white font-semibold rounded-lg px-6 py-3.5 transition-colors no-underline">Servicios</a>
+      <a href="#plano" class="inline-flex items-center justify-center border-[1.5px] border-white/55 hover:border-white text-white font-semibold rounded-lg px-6 py-3.5 transition-colors no-underline">Plano</a>
     </div>
 
     <!-- Stats -->
@@ -264,6 +264,50 @@
         <span style="color:#15803D" class="text-sm font-semibold mt-auto flex items-center gap-1.5 group-hover:gap-2.5 transition-all">Ver horarios <svg class="w-4 h-4"><use href="#i-arrow"/></svg></span>
       </a>
 
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     CÓMO USAR TIM (franja compacta)
+══════════════════════════════════════════════ -->
+<section class="bg-white py-10 border-y border-tim-border">
+  <div class="container-tim">
+    <div class="flex flex-col lg:flex-row lg:items-center gap-6 lg:gap-10">
+      <div class="shrink-0 lg:w-[200px]">
+        <div class="eyebrow">Cómo funciona</div>
+        <h2 class="text-[20px] font-bold tracking-tight text-tim-text">Usá TIM en 3 pasos</h2>
+      </div>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-5 flex-1">
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-full bg-tim-light flex items-center justify-center shrink-0">
+            <img src="iconos/iconos-como-usar-tim/paso-1-destino.svg" alt="" class="w-6 h-6" />
+          </div>
+          <div>
+            <div class="text-[11px] font-bold tracking-[.1em] uppercase text-tim">Paso 01</div>
+            <div class="text-[15px] font-semibold text-tim-text">Elegí tu destino</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-full bg-tim-light flex items-center justify-center shrink-0">
+            <img src="iconos/iconos-como-usar-tim/paso-2-horarios.svg" alt="" class="w-6 h-6" />
+          </div>
+          <div>
+            <div class="text-[11px] font-bold tracking-[.1em] uppercase text-tim">Paso 02</div>
+            <div class="text-[15px] font-semibold text-tim-text">Consultá los horarios</div>
+          </div>
+        </div>
+        <div class="flex items-center gap-3">
+          <div class="w-11 h-11 rounded-full bg-tim-light flex items-center justify-center shrink-0">
+            <img src="iconos/iconos-como-usar-tim/paso-3-planificar.svg" alt="" class="w-6 h-6" />
+          </div>
+          <div>
+            <div class="text-[11px] font-bold tracking-[.1em] uppercase text-tim">Paso 03</div>
+            <div class="text-[15px] font-semibold text-tim-text">Planificá tu viaje</div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 </section>
@@ -562,58 +606,6 @@
 
 
 <!-- ══════════════════════════════════════════════
-     CÓMO USAR TIM
-══════════════════════════════════════════════ -->
-<section class="bg-tim-bgalt py-24">
-  <div class="container-tim">
-
-    <div class="mb-16 text-center">
-      <div class="eyebrow">Cómo funciona</div>
-      <h2 class="section-title mx-auto">Cómo usar TIM</h2>
-      <p class="section-sub mx-auto text-center">Tres pasos para que tu viaje arranque sin vueltas.</p>
-    </div>
-
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-
-      <div class="text-center flex flex-col items-center gap-4">
-        <div class="w-[72px] h-[72px] rounded-full bg-tim-light flex items-center justify-center">
-          <img src="iconos/iconos-como-usar-tim/paso-1-destino.svg" alt="" class="w-10 h-10" />
-        </div>
-        <div>
-          <div class="text-[11px] font-bold tracking-[.1em] uppercase text-tim mb-2">PASO 01</div>
-          <div class="text-[22px] font-semibold text-tim-text mb-2">Elegí tu destino</div>
-          <p class="text-[14px] text-tim-muted leading-relaxed max-w-[280px] mx-auto">Buscá entre 5 líneas de servicio y más de 50 paradas.</p>
-        </div>
-      </div>
-
-      <div class="text-center flex flex-col items-center gap-4">
-        <div class="w-[72px] h-[72px] rounded-full bg-tim-light flex items-center justify-center">
-          <img src="iconos/iconos-como-usar-tim/paso-2-horarios.svg" alt="" class="w-10 h-10" />
-        </div>
-        <div>
-          <div class="text-[11px] font-bold tracking-[.1em] uppercase text-tim mb-2">PASO 02</div>
-          <div class="text-[22px] font-semibold text-tim-text mb-2">Consultá los horarios</div>
-          <p class="text-[14px] text-tim-muted leading-relaxed max-w-[280px] mx-auto">Salidas en tiempo real y frecuencias por día.</p>
-        </div>
-      </div>
-
-      <div class="text-center flex flex-col items-center gap-4">
-        <div class="w-[72px] h-[72px] rounded-full bg-tim-light flex items-center justify-center">
-          <img src="iconos/iconos-como-usar-tim/paso-3-planificar.svg" alt="" class="w-10 h-10" />
-        </div>
-        <div>
-          <div class="text-[11px] font-bold tracking-[.1em] uppercase text-tim mb-2">PASO 03</div>
-          <div class="text-[22px] font-semibold text-tim-text mb-2">Planificá tu viaje</div>
-          <p class="text-[14px] text-tim-muted leading-relaxed max-w-[280px] mx-auto">Guardá tu ruta y recibí alertas de servicio.</p>
-        </div>
-      </div>
-
-    </div>
-  </div>
-</section>
-
-
-<!-- ══════════════════════════════════════════════
      DESTACADOS
 ══════════════════════════════════════════════ -->
 <section class="bg-white py-24">
@@ -707,7 +699,6 @@
           <li><a href="#servicios-terminal" class="hover:opacity-100 transition-opacity">Servicios de la terminal</a></li>
           <li><a href="#plano" class="hover:opacity-100 transition-opacity">Plano de la terminal</a></li>
           <li><a href="#" onclick="window.scrollTo({top:0,behavior:'smooth'});document.getElementById('acc-btn').click();return false;" class="hover:opacity-100 transition-opacity">Accesibilidad</a></li>
-          <li><a href="tel:+542614765875"          class="hover:opacity-100 transition-opacity">Contacto</a></li>
         </ul>
       </div>
 
