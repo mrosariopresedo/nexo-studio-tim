@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Servicios de la terminal · TIM</title>
+<meta name="description" content="Servicios de la Terminal Inteligente de Mendoza: baños, gastronomía, guardaequipaje, cajeros, Wi-Fi, salas de espera, informes, estacionamiento y accesos adaptados, con ubicación, horarios y plano interactivo." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet" />
+
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: { extend: {
+      colors: { tim: { DEFAULT:'#722F37', dark:'#5A2229', light:'#F5EAEB', text:'#333333', muted:'#666666', subtle:'#707070', border:'#DDDDDD', bgalt:'#F7F7F7' } },
+      fontFamily: { sans: ['Inter','system-ui','sans-serif'] },
+    } },
+  };
+</script>
+
+<link rel="stylesheet" href="estilos/style.css" />
+</head>
+<body class="bg-white text-tim-text font-sans antialiased overflow-x-clip">
+
+<!-- ══ SPRITE DE ÍCONOS ══ -->
+<svg width="0" height="0" class="absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-6 7-12a7 7 0 10-14 0c0 6 7 12 7 12z"/><circle cx="12" cy="10" r="2.5"/></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+    <symbol id="i-ticket" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8a2 2 0 012-2h12a2 2 0 012 2v2a2 2 0 100 4v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2a2 2 0 100-4z"/><path d="M14 6v12" stroke-dasharray="2 2"/></symbol>
+    <symbol id="i-coffee" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 010 8h-1"/><path d="M2 8h16v9a4 4 0 01-4 4H6a4 4 0 01-4-4V8z"/><path d="M6 1v3M10 1v3M14 1v3"/></symbol>
+    <symbol id="i-restroom" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><circle cx="7" cy="5" r="2"/><path d="M5 21v-6H4l1.4-4.5a2 2 0 013.8 0L10.6 15H9.6v6z"/><circle cx="17" cy="5" r="2"/><path d="M14.6 21v-4.5h-1l2-6h2.8l2 6h-1V21z"/></symbol>
+    <symbol id="i-bag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></symbol>
+    <symbol id="i-card" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></symbol>
+    <symbol id="i-wifi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5a11 11 0 0114 0"/><path d="M1.5 9a16 16 0 0121 0"/><path d="M8.5 16a6 6 0 017 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></symbol>
+    <symbol id="i-sofa" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 11V8a3 3 0 013-3h8a3 3 0 013 3v3"/><path d="M3 13a2 2 0 014 0v3h10v-3a2 2 0 014 0v6H3z"/><path d="M7 19v2M17 19v2"/></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4M12 8h.01"/></symbol>
+    <symbol id="i-parking" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 17V7h4a3 3 0 010 6H9"/></symbol>
+    <symbol id="i-taxi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 17H4a1 1 0 01-1-1v-3.5L5 8h14l2 4.5V16a1 1 0 01-1 1h-1"/><path d="M9 8V5h6v3"/><circle cx="7.5" cy="17" r="1.5"/><circle cx="16.5" cy="17" r="1.5"/></symbol>
+    <symbol id="i-access" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4.5" r="2"/><path d="M5 9h14"/><path d="M12 7v7"/><path d="M9 21l3-7 3 7"/></symbol>
+    <symbol id="i-gift" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12v9H4v-9"/><rect x="2" y="7" width="20" height="5"/><path d="M12 22V7"/><path d="M12 7H7.5a2.5 2.5 0 010-5C11 2 12 7 12 7z"/><path d="M12 7h4.5a2.5 2.5 0 000-5C13 2 12 7 12 7z"/></symbol>
+  </defs>
+</svg>
+
+<!-- ══ NAVBAR ══ -->
+<header class="bg-tim text-white sticky top-0 z-50 shadow-md">
+  <div class="container-tim flex items-center h-[76px] gap-2 sm:gap-6 lg:gap-10">
+    <a href="index.html" class="flex items-baseline gap-3 no-underline text-white shrink-0">
+      <span class="font-bold text-[28px] tracking-tight">TIM</span>
+      <span class="text-xs opacity-75 hidden sm:inline">Terminal Inteligente de Mendoza</span>
+    </a>
+    <nav class="flex items-center gap-1 ml-2 text-sm font-semibold flex-1" aria-label="Navegación principal">
+      <a href="index.html" class="hidden sm:inline-flex items-center px-3 py-2 rounded-lg hover:bg-white/10 transition-colors">Inicio</a>
+      <div class="relative nav-dd">
+        <button type="button" data-dropdown="dd-lineas" aria-expanded="false" aria-controls="dd-lineas" class="px-3 py-2 rounded-lg hover:bg-white/10 transition-colors inline-flex items-center gap-1.5">Líneas <svg class="w-3 h-3 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div id="dd-lineas" class="dropdown-menu hidden absolute left-0 top-[calc(100%+8px)] bg-white text-tim-text rounded-xl shadow-xl border border-tim-border p-2 w-60 z-50">
+          <a href="https://mrosariopresedo.github.io/tim-larga-distancia/" class="block px-3 py-2 rounded-lg text-sm font-semibold hover:bg-tim-light transition-colors">Larga Distancia</a>
+          <a href="https://luligavilanes.github.io/altamonta-a/" class="block px-3 py-2 rounded-lg text-sm font-semibold hover:bg-tim-light transition-colors">Alta Montaña</a>
+          <a href="https://valmartins222.github.io/Ruta-del-vino/" class="block px-3 py-2 rounded-lg text-sm font-semibold hover:bg-tim-light transition-colors">Ruta del Vino</a>
+          <a href="https://moraraimondo-cyber.github.io/Metrotranvia/" class="block px-3 py-2 rounded-lg text-sm font-semibold hover:bg-tim-light transition-colors">Aeropuerto</a>
+          <a href="https://martinasama2005.github.io/ciudaduniversitaria/" class="block px-3 py-2 rounded-lg text-sm font-semibold hover:bg-tim-light transition-colors">Universitario</a>
+        </div>
+      </div>
+      <div class="relative nav-dd">
+        <button type="button" data-dropdown="dd-terminal" aria-expanded="false" aria-controls="dd-terminal" class="px-3 py-2 rounded-lg hover:bg-white/10 transition-colors inline-flex items-center gap-1.5">La terminal <svg class="w-3 h-3 opacity-80" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+        <div id="dd-terminal" class="dropdown-menu hidden absolute left-0 top-[calc(100%+8px)] bg-white text-tim-text rounded-xl shadow-xl border border-tim-border p-2 w-64 z-50">
+          <a href="consulta-viajes.html" class="block px-3 py-2 rounded-lg text-sm font-semibold hover:bg-tim-light transition-colors">Consultá tu viaje</a>
+          <a href="servicios-terminal.html" class="block px-3 py-2 rounded-lg text-sm font-semibold hover:bg-tim-light transition-colors">Servicios de la terminal</a>
+          <a href="servicios-terminal.html#plano" class="block px-3 py-2 rounded-lg text-sm font-semibold hover:bg-tim-light transition-colors">Plano de la terminal</a>
+        </div>
+      </div>
+    </nav>
+    <div class="relative ml-auto shrink-0">
+      <button id="acc-btn" class="btn-ghost-light text-sm" aria-expanded="false" aria-controls="acc-panel" aria-label="Opciones de accesibilidad">
+        <span class="hidden sm:inline">Accesibilidad</span>
+        <svg class="sm:hidden w-5 h-5" aria-hidden="true"><use href="#i-access"/></svg>
+      </button>
+      <div id="acc-panel" role="dialog" aria-label="Opciones de accesibilidad" class="acc-panel hidden absolute right-0 top-[calc(100%+10px)] bg-white text-tim-text rounded-xl shadow-xl border border-tim-border p-5 w-64 z-50">
+        <p class="text-[11px] font-bold uppercase tracking-[.1em] text-tim-subtle mb-4">Opciones de accesibilidad</p>
+        <div class="flex items-center justify-between mb-4">
+          <div><div class="text-sm font-semibold">Alto contraste</div><div class="text-[12px] text-tim-muted">Fondo negro · texto amarillo</div></div>
+          <button id="toggle-contrast" role="switch" aria-checked="false" class="acc-toggle" aria-label="Activar alto contraste"><span class="acc-toggle-thumb"></span></button>
+        </div>
+        <div class="flex items-center justify-between">
+          <div><div class="text-sm font-semibold">Texto grande</div><div class="text-[12px] text-tim-muted">Aumenta el tamaño de letra</div></div>
+          <button id="toggle-fontsize" role="switch" aria-checked="false" class="acc-toggle" aria-label="Activar texto grande"><span class="acc-toggle-thumb"></span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<main>
+
+<!-- ══ HERO ══ -->
+<section class="bg-tim text-white pt-16 pb-20">
+  <div class="container-tim">
+    <nav aria-label="Breadcrumb" class="text-[13px] opacity-75 mb-6">
+      <a href="index.html" class="text-white opacity-90 hover:opacity-100">Inicio</a>
+      <span class="mx-2 opacity-50">›</span>
+      <span class="font-medium">Servicios de la terminal</span>
+    </nav>
+    <p class="text-[13px] font-semibold tracking-[.12em] uppercase opacity-75 mb-4">Todo en un solo lugar</p>
+    <h1 class="text-[36px] sm:text-[52px] font-bold tracking-[-0.03em] leading-[1] mb-5 max-w-[640px]">Servicios de la terminal</h1>
+    <p class="text-lg leading-relaxed opacity-90 max-w-[580px]">Una terminal abierta las 24 horas, con todo lo que necesitás: gastronomía, baños, equipaje, cajeros, Wi-Fi y más. Y un plano interactivo para ubicarte.</p>
+  </div>
+</section>
+
+<!-- ══ GRID DE SERVICIOS ══ -->
+<section class="bg-white py-16 sm:py-20">
+  <div class="container-tim">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+
+      <article class="card p-6 flex flex-col gap-3">
+        <div class="w-12 h-12 rounded-xl bg-tim-light flex items-center justify-center text-tim" aria-hidden="true"><svg class="w-6 h-6"><use href="#i-ticket"/></svg></div>
+        <div class="text-[17px] font-bold">Boleterías</div>
+        <p class="text-[14px] text-tim-muted leading-relaxed flex-1">Venta de pasajes de todas las empresas, encomiendas y cargas.</p>
+        <div class="flex items-center gap-4 text-[12px] text-tim-subtle pt-3 border-t border-tim-border font-semibold">
+          <span class="inline-flex items-center gap-1.5"><svg class="w-4 h-4 text-tim"><use href="#i-pin"/></svg>Ala Oeste</span>
+          <span class="inline-flex items-center gap-1.5"><svg class="w-4 h-4 text-tim"><use href="#i-clock"/></svg>24 h</span>
+        </div>
+      </article>
+
+      <article class="card p-6 flex flex-col gap-3">
+        <div class="w-12 h-12 rounded-xl bg-tim-light flex items-center justify-center text-tim" aria-hidden="true"><svg class="w-6 h-6"><use href="#i-coffee"/></svg></div>
+        <div class="text-[17px] font-bold">Gastronomía y locales</div>
+        <p class="text-[14px] text-tim-muted leading-relaxed flex-1">Más de 160 locales: cafés, restaurantes, kioscos y comercios.</p>
+        <div class="flex items-center gap-4 text-[12px] text-tim-subtle pt-3 border-t border-tim-border font-semibold">
+          <span class="inline-flex items-center gap-1.5"><svg class="w-4 h-4 text-tim"><use href="#i-pin"/></svg>Hall central</span>
+          <span class="inline-flex items-center gap-1.5"><svg class="w-4 h-4 text-tim"><use href="#i-clock"/></svg>7 a 23 h</span>
+        </div>
+      </article>
+
+      <article class="card p-6 flex flex-col gap-3">
+        <div class="w-12 h-12 rounded-xl bg-tim-light flex items-center justify-center text-tim" aria-hidden="true"><svg class="w-6 h-6"><use href="#i-restroom"/></svg></div>
+        <div class="text-[17px] font-bold">Baños</div>
+        <p class="text-[14px] text-tim-muted leading-relaxed flex-1">Hombres, mujeres, accesible y familiar, con duchas, lactario y cambiador de bebés.</p>
+        <div class="flex items-center gap-4 text-[12px] text-tim-subtle pt-3 border-t border-tim-border font-semibold">
+          <span class="inline-flex items-center gap-1.5"><svg class="w-4 h-4 text-tim"><use href="#i-pin"/></svg>Sector central</span>
+          <span class="inline-flex items-center gap-1.5"><svg class="w-4 h-4 text-tim"><use href="#i-clock"/></svg>24 h</span>
+        </div>
+      </article>
+
+      <article class="card p-6 flex flex-col gap-3">
+        <div class="w-12 h-12 rounded-xl bg-tim-light flex items-center justify-center text-tim" aria-hidden="true"><svg class="w-6 h-6"><use href="#i-bag"/></svg></div>
+        <div class="text-[17px] font-bold">Guardaequipaje</div>
+        <p class="text-[14px] text-tim-muted leading-relaxed flex-1">Dejá tus valijas y bolsos de forma segura, por hora o por día.</p>
+        <div class="flex items-center gap-4 text-[12px] text-tim-subtle pt-3 border-t border-tim-border font-semibold">
+          <span class="inline-flex items-center gap-1.5"><svg class="w-4 h-4 text-tim"><use href="#i-pin"/></svg>Junto a boleterías</span>
+          <span class="inline-flex items-center gap-1.5"><svg class="w-4 h-4 text-tim"><use href="#i-clock"/></svg>24 h</span>
+        </div>
+      </article>
+
+      <article class="card p-6 flex flex-col gap-3">
+        <div class="w-12 h-12 rounded-xl bg-tim-light flex items-center justify-center text-tim" aria-hidden="true"><svg class="w-6 h-6"><use href="#i-card"/></svg></div>
+        <div class="text-[17px] font-bold">Cajeros automáticos</div>
+        <p class="text-[14px] text-tim-muted leading-relaxed flex-1">Cajeros de distintas redes para retirar efectivo a cualquier hora.</p>
+        <div class="flex items-center gap-4 text-[12px] text-tim-subtle pt-3 border-t border-tim-border font-semibold">
+          <span class="inline-flex items-center gap-1.5"><svg class="w-4 h-4 text-tim"><use href="#i-pin"/></svg>Hall central</span>
+          <span class="inline-flex items-center gap-1.5"><svg class="w-4 h-4 text-tim"><use href="#i-clock"/></svg>24 h</span>
+        </div>
+      </article>
+
+      <article class="card p-6 flex flex-col gap-3">
+        <div class="w-12 h-12 rounded-xl bg-tim-light flex items-center justify-center text-tim" aria-hidden="true"><svg class="w-6 h-6"><use href="#i-wifi"/></svg></div>
+        <div class="text-[17px] font-bold">Wi-Fi gratuito</div>
+        <p class="text-[14px] text-tim-muted leading-relaxed flex-1">Conectate sin contraseña a la red TIM-Libre en toda la terminal.</p>
+        <div class="flex items-center gap-4 text-[12px] text-tim-subtle pt-3 border-t border-tim-border font-semibold">
+          <span class="inline-flex items-center gap-1.5"><svg class="w-4 h-4 text-tim"><use href="#i-pin"/></svg>Toda la terminal</span>
+          <span class="inline-flex items-center gap-1.5"><svg class="w-4 h-4 text-tim"><use href="#i-clock"/></svg>24 h</span>
+        </div>
+      </article>
+
+      <article class="card p-6 flex flex-col gap-3">
+        <div class="w-12 h-12 rounded-xl bg-tim-light flex items-center justify-center text-tim" aria-hidden="true"><svg class="w-6 h-6"><use href="#i-sofa"/></svg></div>
+        <div class="text-[17px] font-bold">Salas de espera</div>
+        <p class="text-[14px] text-tim-muted leading-relaxed flex-1">Sectores con asientos, pantallas de salidas y carga de dispositivos.</p>
+        <div class="flex items-center gap-4 text-[12px] text-tim-subtle pt-3 border-t border-tim-border font-semibold">
+          <span class="inline-flex items-center gap-1.5"><svg class="w-4 h-4 text-tim"><use href="#i-pin"/></svg>Plantas alta y baja</span>
+          <span class="inline-flex items-center gap-1.5"><svg class="w-4 h-4 text-tim"><use href="#i-clock"/></svg>24 h</span>
+        </div>
+      </article>
+
+      <article class="card p-6 flex flex-col gap-3">
+        <div class="w-12 h-12 rounded-xl bg-tim-light flex items-center justify-center text-tim" aria-hidden="true"><svg class="w-6 h-6"><use href="#i-info"/></svg></div>
+        <div class="text-[17px] font-bold">Turismo e informes</div>
+        <p class="text-[14px] text-tim-muted leading-relaxed flex-1">Información de la terminal, de la ciudad y coordinación de asistencia.</p>
+        <div class="flex items-center gap-4 text-[12px] text-tim-subtle pt-3 border-t border-tim-border font-semibold">
+          <span class="inline-flex items-center gap-1.5"><svg class="w-4 h-4 text-tim"><use href="#i-pin"/></svg>Hall central</span>
+          <span class="inline-flex items-center gap-1.5"><svg class="w-4 h-4 text-tim"><use href="#i-clock"/></svg>7 a 22 h</span>
+        </div>
+      </article>
+
+      <article class="card p-6 flex flex-col gap-3">
+        <div class="w-12 h-12 rounded-xl bg-tim-light flex items-center justify-center text-tim" aria-hidden="true"><svg class="w-6 h-6"><use href="#i-parking"/></svg></div>
+        <div class="text-[17px] font-bold">Estacionamiento</div>
+        <p class="text-[14px] text-tim-muted leading-relaxed flex-1">Playa de más de 8.000 m², con acceso por calle Alberdi.</p>
+        <div class="flex items-center gap-4 text-[12px] text-tim-subtle pt-3 border-t border-tim-border font-semibold">
+          <span class="inline-flex items-center gap-1.5"><svg class="w-4 h-4 text-tim"><use href="#i-pin"/></svg>Acceso por Alberdi</span>
+          <span class="inline-flex items-center gap-1.5"><svg class="w-4 h-4 text-tim"><use href="#i-clock"/></svg>24 h</span>
+        </div>
+      </article>
+
+      <article class="card p-6 flex flex-col gap-3">
+        <div class="w-12 h-12 rounded-xl bg-tim-light flex items-center justify-center text-tim" aria-hidden="true"><svg class="w-6 h-6"><use href="#i-taxi"/></svg></div>
+        <div class="text-[17px] font-bold">Parada de taxis</div>
+        <p class="text-[14px] text-tim-muted leading-relaxed flex-1">Taxis y remises habilitados en el acceso principal.</p>
+        <div class="flex items-center gap-4 text-[12px] text-tim-subtle pt-3 border-t border-tim-border font-semibold">
+          <span class="inline-flex items-center gap-1.5"><svg class="w-4 h-4 text-tim"><use href="#i-pin"/></svg>Acceso Av. Videla</span>
+          <span class="inline-flex items-center gap-1.5"><svg class="w-4 h-4 text-tim"><use href="#i-clock"/></svg>24 h</span>
+        </div>
+      </article>
+
+      <article class="card p-6 flex flex-col gap-3">
+        <div class="w-12 h-12 rounded-xl bg-tim-light flex items-center justify-center text-tim" aria-hidden="true"><svg class="w-6 h-6"><use href="#i-access"/></svg></div>
+        <div class="text-[17px] font-bold">Accesos adaptados</div>
+        <p class="text-[14px] text-tim-muted leading-relaxed flex-1">Rampas, ascensores, baño accesible, señalización en Braille y asistencia de embarque.</p>
+        <div class="flex items-center gap-4 text-[12px] text-tim-subtle pt-3 border-t border-tim-border font-semibold">
+          <span class="inline-flex items-center gap-1.5"><svg class="w-4 h-4 text-tim"><use href="#i-pin"/></svg>Toda la terminal</span>
+          <span class="inline-flex items-center gap-1.5"><svg class="w-4 h-4 text-tim"><use href="#i-clock"/></svg>24 h</span>
+        </div>
+      </article>
+
+      <article class="card p-6 flex flex-col gap-3">
+        <div class="w-12 h-12 rounded-xl bg-tim-light flex items-center justify-center text-tim" aria-hidden="true"><svg class="w-6 h-6"><use href="#i-gift"/></svg></div>
+        <div class="text-[17px] font-bold">Feria artesanal</div>
+        <p class="text-[14px] text-tim-muted leading-relaxed flex-1">Productos regionales y artesanías mendocinas para llevar de recuerdo.</p>
+        <div class="flex items-center gap-4 text-[12px] text-tim-subtle pt-3 border-t border-tim-border font-semibold">
+          <span class="inline-flex items-center gap-1.5"><svg class="w-4 h-4 text-tim"><use href="#i-pin"/></svg>Hall central</span>
+          <span class="inline-flex items-center gap-1.5"><svg class="w-4 h-4 text-tim"><use href="#i-clock"/></svg>10 a 21 h</span>
+        </div>
+      </article>
+
+    </div>
+
+    <!-- Mini chatbot de ayuda -->
+    <div class="mt-14 grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-8 items-center">
+      <div>
+        <div class="eyebrow">¿Tenés una duda?</div>
+        <h2 class="text-[26px] font-bold tracking-tight mb-3">Preguntale al asistente TIM</h2>
+        <p class="text-[15px] text-tim-muted leading-relaxed">Un asistente que te responde al instante sobre los servicios de la terminal: plataformas, baños, equipaje, cómo llegar y más.</p>
+      </div>
+
+      <div class="card overflow-hidden">
+        <div class="bg-tim text-white px-5 py-4 flex items-center gap-3">
+          <span class="text-2xl" aria-hidden="true">🤖</span>
+          <div>
+            <div class="font-bold text-[15px]">Asistente TIM</div>
+            <div class="text-[12px] opacity-80">Te ayudo con los servicios de la terminal</div>
+          </div>
+        </div>
+        <div id="chat-mensajes" class="flex flex-col gap-3 p-5 h-[300px] overflow-y-auto bg-tim-bgalt" aria-live="polite"></div>
+        <div class="px-5 pt-4 flex gap-2 flex-wrap border-t border-tim-border">
+          <button type="button" class="chat-chip text-[13px] font-semibold bg-white border border-tim-border rounded-full px-3 py-1.5 hover:border-tim transition-colors">¿Dónde están los baños?</button>
+          <button type="button" class="chat-chip text-[13px] font-semibold bg-white border border-tim-border rounded-full px-3 py-1.5 hover:border-tim transition-colors">¿Cómo llego?</button>
+          <button type="button" class="chat-chip text-[13px] font-semibold bg-white border border-tim-border rounded-full px-3 py-1.5 hover:border-tim transition-colors">Equipaje</button>
+          <button type="button" class="chat-chip text-[13px] font-semibold bg-white border border-tim-border rounded-full px-3 py-1.5 hover:border-tim transition-colors">Wi-Fi</button>
+        </div>
+        <form id="chat-form" class="flex gap-2 p-5 pt-3">
+          <input id="chat-input" type="text" placeholder="Escribí tu pregunta…" autocomplete="off" aria-label="Escribí tu pregunta para el asistente" class="flex-1 border border-tim-border rounded-lg px-4 h-[46px] text-sm outline-none focus:border-tim" />
+          <button type="submit" class="btn-primary text-sm px-5">Enviar</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══ PLANO DE LA TERMINAL ══ -->
+<section id="plano" class="bg-tim-bgalt py-16 sm:py-20 border-t border-tim-border">
+  <div class="container-tim">
+    <div class="mb-10">
+      <div class="eyebrow">Plano interactivo</div>
+      <h2 class="section-title">Plano de la terminal</h2>
+      <p class="section-sub">Tocá cualquier sector para ver qué hay, dónde está y su horario. También podés recorrerlo con el teclado.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-8 items-start">
+      <div class="bg-white border border-tim-border rounded-xl p-4 sm:p-6">
+        <svg viewBox="0 0 820 620" class="w-full h-auto block" role="group" aria-label="Plano de sectores de la terminal">
+          <g class="zona" data-id="plataformas" tabindex="0" role="button" aria-label="Plataformas y andenes">
+            <rect x="60" y="50" width="700" height="72" rx="8"/>
+            <text x="410" y="92" text-anchor="middle" font-size="16">Plataformas / Andenes  ·  A · B · C</text>
+          </g>
+          <g class="zona" data-id="accesos" tabindex="0" role="button" aria-label="Accesos">
+            <rect x="60" y="150" width="220" height="110" rx="8"/>
+            <text x="170" y="210" text-anchor="middle" font-size="15">Accesos</text>
+          </g>
+          <g class="zona" data-id="hall" tabindex="0" role="button" aria-label="Hall central">
+            <rect x="300" y="150" width="220" height="110" rx="8"/>
+            <text x="410" y="210" text-anchor="middle" font-size="15">Hall central</text>
+          </g>
+          <g class="zona" data-id="espera" tabindex="0" role="button" aria-label="Salas de espera">
+            <rect x="540" y="150" width="220" height="110" rx="8"/>
+            <text x="650" y="210" text-anchor="middle" font-size="15">Salas de espera</text>
+          </g>
+          <g class="zona" data-id="boleterias" tabindex="0" role="button" aria-label="Boleterías">
+            <rect x="60" y="280" width="220" height="110" rx="8"/>
+            <text x="170" y="340" text-anchor="middle" font-size="15">Boleterías</text>
+          </g>
+          <g class="zona" data-id="banos" tabindex="0" role="button" aria-label="Baños">
+            <rect x="300" y="280" width="220" height="110" rx="8"/>
+            <text x="410" y="340" text-anchor="middle" font-size="15">Baños</text>
+          </g>
+          <g class="zona" data-id="gastronomia" tabindex="0" role="button" aria-label="Gastronomía y locales">
+            <rect x="540" y="280" width="220" height="110" rx="8"/>
+            <text x="650" y="340" text-anchor="middle" font-size="15">Gastronomía</text>
+          </g>
+          <g class="zona" data-id="guardaequipaje" tabindex="0" role="button" aria-label="Guardaequipaje">
+            <rect x="60" y="410" width="220" height="110" rx="8"/>
+            <text x="170" y="470" text-anchor="middle" font-size="14">Guardaequipaje</text>
+          </g>
+          <g class="zona" data-id="cajeros" tabindex="0" role="button" aria-label="Cajeros y Wi-Fi">
+            <rect x="300" y="410" width="220" height="110" rx="8"/>
+            <text x="410" y="470" text-anchor="middle" font-size="15">Cajeros · Wi-Fi</text>
+          </g>
+          <g class="zona" data-id="informes" tabindex="0" role="button" aria-label="Turismo e informes">
+            <rect x="540" y="410" width="220" height="110" rx="8"/>
+            <text x="650" y="470" text-anchor="middle" font-size="15">Informes</text>
+          </g>
+          <g class="zona" data-id="estacionamiento" tabindex="0" role="button" aria-label="Estacionamiento">
+            <rect x="60" y="540" width="700" height="48" rx="8"/>
+            <text x="410" y="570" text-anchor="middle" font-size="15">Estacionamiento  ·  acceso por calle Alberdi</text>
+          </g>
+        </svg>
+      </div>
+
+      <aside id="plano-info" class="card p-7 lg:sticky lg:top-24" aria-live="polite"></aside>
+    </div>
+
+    <div class="mt-8 flex flex-wrap gap-2">
+      <span class="text-[13px] text-tim-muted font-semibold self-center mr-1">Ir a:</span>
+      <button type="button" class="text-[13px] font-semibold bg-white border border-tim-border rounded-full px-3.5 py-1.5 hover:border-tim transition-colors" onclick="seleccionarZona('plataformas')">Plataformas</button>
+      <button type="button" class="text-[13px] font-semibold bg-white border border-tim-border rounded-full px-3.5 py-1.5 hover:border-tim transition-colors" onclick="seleccionarZona('banos')">Baños</button>
+      <button type="button" class="text-[13px] font-semibold bg-white border border-tim-border rounded-full px-3.5 py-1.5 hover:border-tim transition-colors" onclick="seleccionarZona('gastronomia')">Gastronomía</button>
+      <button type="button" class="text-[13px] font-semibold bg-white border border-tim-border rounded-full px-3.5 py-1.5 hover:border-tim transition-colors" onclick="seleccionarZona('estacionamiento')">Estacionamiento</button>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ══ FOOTER ══ -->
+<footer class="bg-tim-text text-white pt-16 pb-8">
+  <div class="container-tim">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-[2fr_1fr_1fr_1fr] gap-12 pb-12 border-b border-white/10">
+      <div>
+        <div class="text-[32px] font-bold tracking-tight">TIM</div>
+        <div class="text-[13px] opacity-70 mt-1.5">Terminal Inteligente de Mendoza</div>
+        <address class="text-sm not-italic opacity-85 mt-5 leading-relaxed max-w-[280px]">Juan B. Alberdi s/n, M5519<br>Guaymallén, Mendoza, Argentina<br><span class="opacity-60">Atención 24/7 · 0261 476-5875</span></address>
+      </div>
+      <div>
+        <div class="text-[13px] font-bold tracking-[.08em] uppercase mb-4">Navegación</div>
+        <ul class="flex flex-col gap-2.5 text-sm opacity-80">
+          <li><a href="index.html" class="hover:opacity-100 transition-opacity">Inicio</a></li>
+          <li><a href="consulta-viajes.html" class="hover:opacity-100 transition-opacity">Consultá tu viaje</a></li>
+          <li><a href="servicios-terminal.html" class="hover:opacity-100 transition-opacity">Servicios de la terminal</a></li>
+          <li><a href="servicios-terminal.html#plano" class="hover:opacity-100 transition-opacity">Plano de la terminal</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="text-[13px] font-bold tracking-[.08em] uppercase mb-4">Líneas</div>
+        <ul class="flex flex-col gap-2.5 text-sm opacity-80">
+          <li><a href="https://mrosariopresedo.github.io/tim-larga-distancia/" class="hover:opacity-100 transition-opacity">Larga Distancia</a></li>
+          <li><a href="https://luligavilanes.github.io/altamonta-a/" class="hover:opacity-100 transition-opacity">Alta Montaña</a></li>
+          <li><a href="https://valmartins222.github.io/Ruta-del-vino/" class="hover:opacity-100 transition-opacity">Ruta del Vino</a></li>
+          <li><a href="https://moraraimondo-cyber.github.io/Metrotranvia/" class="hover:opacity-100 transition-opacity">Aeropuerto</a></li>
+          <li><a href="https://martinasama2005.github.io/ciudaduniversitaria/" class="hover:opacity-100 transition-opacity">Universitario</a></li>
+        </ul>
+      </div>
+      <div>
+        <div class="text-[13px] font-bold tracking-[.08em] uppercase mb-4">Información</div>
+        <ul class="flex flex-col gap-2.5 text-sm opacity-80">
+          <li><a href="https://www.google.com/maps/search/?api=1&query=Terminal+de+Omnibus+de+Mendoza" class="hover:opacity-100 transition-opacity">Cómo llegar</a></li>
+          <li><a href="consulta-viajes.html" class="hover:opacity-100 transition-opacity">Tarifas</a></li>
+          <li><a href="servicios-terminal.html#plano" class="hover:opacity-100 transition-opacity">Plano de la terminal</a></li>
+        </ul>
+      </div>
+    </div>
+    <div class="flex justify-between items-center mt-6 text-[13px] opacity-65 flex-wrap gap-3">
+      <div>© 2026 Nexo Studio · Terminal Inteligente de Mendoza</div>
+      <div>Hecho en Mendoza, Argentina</div>
+    </div>
+  </div>
+</footer>
+
+<script src="js/terminal-comun.js" defer></script>
+<script src="js/chatbot.js" defer></script>
+<script src="js/plano.js" defer></script>
+
+</body>
+</html>
